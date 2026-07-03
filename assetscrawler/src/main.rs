@@ -1,4 +1,5 @@
 mod dbmg;
+//mod nwsc;
 
 use rusqlite::{Connection, Result};
 use dbmg::{Table,Databasemanager};
