@@ -1,8 +1,9 @@
 mod dbmg;
-//mod nwsc;
+mod nwsc;
 
 use rusqlite::{Connection, Result};
 use dbmg::{Table,Databasemanager};
+
 
 #[derive(Debug)]
 struct Person {
@@ -13,13 +14,17 @@ struct Person {
 
 fn main() -> Result<()> {
 
-    let path = "./plugins/assetscrawler/test.db";
+    let path = "./common/assetscrawler/test.db";
     let conn = Connection::open(path)?;
     let dbm = Databasemanager::new(String::from(path),conn);
     print!("{}",dbm.dbmeta());
 
+    if let Ok(text) = nwsc::readurl("https://www.rust-lang.org"){
+        println!("{}",text)
+    }
+
     dbm.execute(
-        "CREATE TABLE person (
+        "CREATE TABLE IF NOT EXISTS Person (
             id   INTEGER PRIMARY KEY,
             name TEXT NOT NULL,
             data BLOB
@@ -28,7 +33,7 @@ fn main() -> Result<()> {
     )?;
     let me = Person {
         id: 0,
-        name: "Steven".to_string(),
+        name: "Stven".to_string(),
         data: None,
     };
     let table = Table::new(&me);

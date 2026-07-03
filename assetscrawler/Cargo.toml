@@ -16,3 +16,4 @@ toml = { workspace = true }
 csv = { workspace = true }
 ndarray = "0.17.2"
 polars = "0.54.4"
+futures = "0.3.32"
