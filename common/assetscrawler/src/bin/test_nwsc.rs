@@ -68,27 +68,27 @@ async fn test_timeout_and_retry(client: &Client, url: &str) -> Result<()> {
     }
 }
 
-// 4️⃣ 构造请求头（User-Agent, Referer, 自定义头等）
-async fn test_custom_headers(client: &Client) -> Result<()> {
-    // 创建一个新的 Client 以演示自定义 headers（也可以使用 .header() 单次发送）
-    let custom_client = reqwest::Client::builder()
-        .user_agent("MyRustCrawler/1.0")
-        .default_headers({
-            let mut headers = reqwest::header::HeaderMap::new();
-            headers.insert("X-Custom-Header", "Hello".parse().unwrap());
-            headers
-        })
-        .build()?;
+// // 4️⃣ 构造请求头（User-Agent, Referer, 自定义头等）
+// async fn test_custom_headers(client: &Client) -> Result<()> {
+//     // 创建一个新的 Client 以演示自定义 headers（也可以使用 .header() 单次发送）
+//     let custom_client = reqwest::Client::builder()
+//         .user_agent("MyRustCrawler/1.0")
+//         .default_headers({
+//             let mut headers = reqwest::header::HeaderMap::new();
+//             headers.insert("X-Custom-Header", "Hello".parse().unwrap());
+//             headers
+//         })
+//         .build()?;
 
-    let resp = custom_client
-        .get("https://httpbin.org/headers")
-        .header("Referer", "https://example.com")
-        .send()
-        .await?;
-    let body = resp.text().await?;
-    println!("📨 服务端收到的请求头: \n{}", body);
-    Ok(())
-}
+//     let resp = custom_client
+//         .get("https://httpbin.org/headers")
+//         .header("Referer", "https://example.com")
+//         .send()
+//         .await?;
+//     let body = resp.text().await?;
+//     println!("📨 服务端收到的请求头: \n{}", body);
+//     Ok(())
+// }
 
 // 5️⃣ 下载直链资源（图片/文件）
 async fn test_download_file(client: &Client, url: &str, save_path: &str) -> Result<()> {
@@ -142,7 +142,7 @@ async fn concurrent_test(client: &Client) -> Result<()> {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    // 创建一个默认客户端（会复用连接池）
+
     let client = Client::new();
 
     println!("========== 1. 状态码与文本 ==========");
@@ -155,8 +155,8 @@ async fn main() -> Result<()> {
     // 使用一个响应较慢的 URL（httpbin.org/delay/10）模拟超时
     test_timeout_and_retry(&client, "https://postman-echo.com/delay/10").await?; // 会超时然后重试
 
-    println!("\n========== 4. 自定义请求头 ==========");
-    test_custom_headers(&client).await?;
+    // println!("\n========== 4. 自定义请求头 ==========");
+    // test_custom_headers(&client).await?;
 
     println!("\n========== 5. 下载直链资源 ==========");
     // 下载一张小图片（例如 favicon）
