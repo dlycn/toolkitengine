@@ -1,5 +1,5 @@
 [workspace]
-members = [ ".","common/assetscrawler", "common/texturedisplay" ]
+members = [ ".", "common/assetscrawler", "common/texturedisplay" ]
 exclude = [ "tools/*", "test/*" ]
 
 
@@ -7,10 +7,22 @@ exclude = [ "tools/*", "test/*" ]
 anyhow = "1.0.102"
 image = "0.25.10"
 serde = "1.0.228"
-serde_json = "1.0.150"
 csv = "1.4.0"
 toml = "1.1.2"
 rand = "0.10.1"
+tracing = "0.1.44"
+tracing-appender = "0.2.5"
+
+
+[workspace.dependencies.tracing-subscriber]
+version = "0.3.23"
+features = [ "env-filter", "fmt" ]
+
+
+[workspace.dependencies.serde_json]
+version = "1.0.150"
+features = [ "preserve_order" ]
+
 
 [workspace.package]
 version = "0.1.1"
@@ -22,33 +34,77 @@ authors = [ "dlycn" ]
 [package]
 name = "toolkitengine"
 
-version = { workspace = true }
-edition = { workspace = true }
-authors = { workspace = true }
-license = { workspace = true }
+
+[package.version]
+workspace = true
+
+
+[package.edition]
+workspace = true
+
+
+[package.authors]
+workspace = true
+
+
+[package.license]
+workspace = true
+
 
 [dependencies]
 bevy_basisu_loader = "0.6.0"
-anyhow = { workspace = true }
-image = { workspace = true }
-serde = { workspace = true }
-toml = { workspace = true }
-serde_json = { workspace = true }
-csv = { workspace = true }
-rand = { workspace = true }
 bevy-inspector-egui = "0.37.0"
 bevy_egui = "0.40.1"
 
 
+[dependencies.tracing]
+workspace = true
+
+
+[dependencies.tracing-subscriber]
+workspace = true
+
+
+[dependencies.tracing-appender]
+workspace = true
+
+
+[dependencies.anyhow]
+workspace = true
+
+
+[dependencies.image]
+workspace = true
+
+
+[dependencies.serde]
+workspace = true
+
+
+[dependencies.toml]
+workspace = true
+
+
+[dependencies.serde_json]
+workspace = true
+
+
+[dependencies.csv]
+workspace = true
+
+
+[dependencies.rand]
+workspace = true
+
+
 [dependencies.bevy]
 version = "0.19.0"
-features = ["default","ktx2","dds"]
+features = [ "default", "ktx2", "dds" ]
 
 
 [dependencies.clap]
 version = "4.6.1"
 features = [ "derive", "color" ]
-
 
 
 [profile.dev]
@@ -57,7 +113,8 @@ debug = 1
 
 [profile.dev.package."*"]
 debug = false
-opt-level = 1         
+opt-level = 1
+
 
 [profile.release]
 opt-level = 3

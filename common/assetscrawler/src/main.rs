@@ -1,59 +1,47 @@
 mod dbmg;
 mod nwsc;
-
+use dbmg::{Databasemanager, Table};
 use rusqlite::{Connection, Result};
-use dbmg::{Table,Databasemanager};
+use serde::*;
 
-
-#[derive(Debug)]
+#[derive(Serialize, Debug, Default, Clone)]
 struct Person {
-    id: i32,
     name: String,
-    data: Option<Vec<u8>>,
+    data: u8,
 }
 
 fn main() -> Result<()> {
-
-    let path = "./common/assetscrawler/test.db";
+    let path = "./common/assetscrawler/assets.db";
     let conn = Connection::open(path)?;
-    let dbm = Databasemanager::new(String::from(path),conn);
-    print!("{}",dbm.dbmeta());
+    let dbm = Databasemanager::new(String::from(path), conn);
+    print!("{}", dbm.dbmeta());
+    let text = nwsc::readurl("https://www.rust-lang.org");
+    println!("{}", text.len());
 
-    if let Ok(text) = nwsc::readurl("https://www.rust-lang.org"){
-        println!("{}",text)
-    }
-
-    dbm.execute(
-        "CREATE TABLE IF NOT EXISTS Person (
-            id   INTEGER PRIMARY KEY,
-            name TEXT NOT NULL,
-            data BLOB
-        )",
-        (), // empty list of parameters.
-    )?;
     let me = Person {
-        id: 0,
         name: "Stven".to_string(),
-        data: None,
+        data: u8::MAX,
     };
-    let table = Table::new(&me);
-    dbm.execute(
-        "INSERT INTO person (name, data) VALUES (?1, ?2)",
-        (&me.name, &me.data),
-    )?;
-    println!("table.data.id:{}",table.data.id);
+    let table = Table::new(me.clone());
+    let dbtsys = table.sys().pk("name").go();
+    let dbtupd = table.update();
+    let dptdop =table.drop();
+    dbm.execute(&dbtsys, ())?;
+    dbm.execute(&dbtupd, (&me.name, &me.data))?;
 
-    let mut stmt = dbm.prepare("SELECT id, name, data FROM person")?;
+    println!("name:{}", table.data.name);
+
+    let mut stmt = dbm.prepare("SELECT name, data FROM person")?;
     let person_iter = stmt.query_map([], |row| {
         Ok(Person {
-            id: row.get(0)?,
-            name: row.get(1)?,
-            data: row.get(2)?,
+            name: row.get(0)?,
+            data: row.get(1)?,
         })
     })?;
 
     for person in person_iter {
         println!("Found person {:?}", person?);
     }
+
     Ok(())
 }
