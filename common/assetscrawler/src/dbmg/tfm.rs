@@ -1,7 +1,7 @@
 
 use serde::*;
 use serde_json;
-use std::any::type_name;
+use std::{any::type_name, ops::Index};
 
 fn matchdbtype(v: serde_json::Value)->(String,DBtype) {
     match v {
@@ -63,6 +63,7 @@ impl<'a, T: Serialize + 'static> CreateTableBuilder<'a, T> {
 pub struct Table<T> {
     pub data: T,
     pub name: String,
+    pub rows: Vec<String>
 }
 
 impl<T: Serialize + 'static> Table<T> {
@@ -73,9 +74,19 @@ impl<T: Serialize + 'static> Table<T> {
             .last()
             .unwrap_or("")
             .to_string();
-        Self { data, name } // 假设结构体中有一个名为 meta 的字段
+        let rows: Vec<String> = Vec::new();
+        Self { data, name, rows } // 假设结构体中有一个名为 meta 的字段
     }
 
+    pub fn anchor(mut self,coln:String)->Self{
+        let mut rows:   Vec<String> = self.table_rown();
+        let upk = rows.index(0);
+        if rows.contains(&coln){
+            rows = vec![upk.clone(),coln]
+        }
+        self.rows=rows;
+        self
+    }
 
     pub fn table_name(&self) -> String {
         self.name.clone()
@@ -105,10 +116,12 @@ impl<T: Serialize + 'static> Table<T> {
         }
     }
 
-    pub fn update(&self) ->String{
-        let rows:   Vec<String> = self.table_rown();
-        let coins: Vec<String>= rows.iter().enumerate().map(|(i,_)|format!("?{}", i + 1)).collect();
-        format!("INSERT OR REPLACE INTO {} ({}) VALUES ({})",self.name,rows.join(", "), coins.join(","))
+    pub fn  update(&self,lines:usize) ->String{
+        let rows:   Vec<String> = if self.rows.is_empty(){self.table_rown()}else{self.rows.clone()};
+        let coins: Vec<String>= rows.iter().map(|_|format!("?")).collect();
+        let bath = format!("({})", coins.join(","));
+        let coinlines = vec![bath; lines].join(", ");
+        format!("INSERT OR REPLACE INTO {} ({}) VALUES {}",self.name,rows.join(", "), coinlines)
     }
 
     pub fn drop(&self) ->String{

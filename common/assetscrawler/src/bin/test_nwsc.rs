@@ -68,27 +68,27 @@ async fn test_timeout_and_retry(client: &Client, url: &str) -> Result<()> {
     }
 }
 
-// // 4️⃣ 构造请求头（User-Agent, Referer, 自定义头等）
-// async fn test_custom_headers(client: &Client) -> Result<()> {
-//     // 创建一个新的 Client 以演示自定义 headers（也可以使用 .header() 单次发送）
-//     let custom_client = reqwest::Client::builder()
-//         .user_agent("MyRustCrawler/1.0")
-//         .default_headers({
-//             let mut headers = reqwest::header::HeaderMap::new();
-//             headers.insert("X-Custom-Header", "Hello".parse().unwrap());
-//             headers
-//         })
-//         .build()?;
+// 4️⃣ 构造请求头（User-Agent, Referer, 自定义头等）
+async fn test_custom_headers(client: &Client) -> Result<()> {
+    // 创建一个新的 Client 以演示自定义 headers（也可以使用 .header() 单次发送）
+    let custom_client = reqwest::Client::builder()
+        .user_agent("MyRustCrawler/1.0")
+        .default_headers({
+            let mut headers = reqwest::header::HeaderMap::new();
+            headers.insert("X-Custom-Header", "Hello".parse().unwrap());
+            headers
+        })
+        .build()?;
 
-//     let resp = custom_client
-//         .get("https://httpbin.org/headers")
-//         .header("Referer", "https://example.com")
-//         .send()
-//         .await?;
-//     let body = resp.text().await?;
-//     println!("📨 服务端收到的请求头: \n{}", body);
-//     Ok(())
-// }
+    let resp = custom_client
+        .get("https://httpbin.org/headers")
+        .header("Referer", "https://example.com")
+        .send()
+        .await?;
+    let body = resp.text().await?;
+    println!("📨 服务端收到的请求头: \n{}", body);
+    Ok(())
+}
 
 // 5️⃣ 下载直链资源（图片/文件）
 async fn test_download_file(client: &Client, url: &str, save_path: &str) -> Result<()> {
