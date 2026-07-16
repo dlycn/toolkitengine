@@ -2,7 +2,7 @@
 
 use reqwest;
 pub mod task;
-mod resd;
+mod resdata;
 
 pub async fn ayasurl(url: &str,client: &reqwest::Client) -> String {
     let start = std::time::Instant::now();

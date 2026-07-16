@@ -1,6 +1,6 @@
 //databasemanager
 
-mod tfm;
+pub mod tfm;
 
 use std::fs;
 
@@ -8,7 +8,7 @@ use serde::*;
 
 use rusqlite::{Connection, Params, Result, Statement};
 
-pub use self::tfm::Table;
+use tfm::Table;
 
 // 1. 数据库构建器（去掉泛型 T，只管理连接）
 pub struct Dbmbuilder {
@@ -30,6 +30,7 @@ impl Dbmbuilder {
             db_builder: self,    // 借用构建器（可变）
             table,
             primary_key: None,
+            rowname: None
         }
     }
 
@@ -38,9 +39,18 @@ impl Dbmbuilder {
         self.manager.desc_execute(sql, [],desc)
     }
 
-    pub(crate) fn update<P: Params>(&self, sql: &str,params: P,desc: &str) -> Result<usize> {
+    pub(crate) fn run<P: Params>(&self, sql: &str,params: P,desc: &str) -> Result<usize> {
         self.manager.desc_execute(sql,params,desc)
     }    
+
+    pub fn transaction(&self, mode: bool) -> Result<usize> {
+        let (sql, desc) = if mode {
+            ("BEGIN TRANSACTION", "开启数据库事务")
+        } else {
+            ("COMMIT", "提交数据库事务")
+        };
+        self.execute(sql, desc)
+    }
 
 }
 
@@ -48,12 +58,20 @@ pub struct TableOperator<'a, T> {
     db_builder: &'a mut Dbmbuilder,  // 对主构建器的可变借用
     table: &'a Table<T>,
     primary_key: Option<String>,
+    rowname: Option<String>
 }
 
 impl<'a, T: Serialize + 'static> TableOperator<'a, T> {
     pub fn pk(mut self, key: &str) -> Self {
         self.primary_key = Some(key.to_string());
         self
+    }
+
+    pub fn row(mut self, row: &str) -> Self {
+        let r = row.to_string();
+        if self.table.table_rown().contains(&r){
+            self.rowname = Some(r);}
+    self
     }
 
     pub fn create(self) -> &'a mut Dbmbuilder {
@@ -81,12 +99,33 @@ impl<'a, T: Serialize + 'static> TableOperator<'a, T> {
         self.db_builder
     }
 
+    pub fn update<P: Params+ std::fmt::Debug>(self,pkn: String,params:P) -> &'a mut Dbmbuilder {
+            let pk = self.primary_key.unwrap_or_default();
+            let rn = self.rowname.unwrap_or_default();        
+        if !pk.is_empty(){
+            let sql = self.table.fixupdate(&pk,&rn, &pkn);
+            let desc = format!("更新数据表{}，条目：[{}={}]，{}={:?}",self.table.name,pk,pkn,rn,params);
+            let _ = self.db_builder.run(&sql,params,desc.as_str());
+        }else{println!("unexpect primary_key:{},rowname:{}",pk,rn);}
+        self.db_builder
+    }
+
+    pub fn delete(self,pkn: String) -> &'a mut Dbmbuilder {
+            let pk = self.primary_key.unwrap_or_default();     
+        if !pk.is_empty(){
+            let sql = self.table.delete(&pk,&pkn);
+            let desc = format!("删除数据表{}，条目：[{}={}]",self.table.name,pk,pkn);
+            let _ = self.db_builder.execute(&sql,desc.as_str());
+        }else{println!("unexpect primary_key:{}",pk);}
+        self.db_builder
+    }
+
     // 插入数据
     pub fn append<P: Params>(self,lines:usize,params:P) -> &'a mut Dbmbuilder {
-        let sql = self.table.update(lines);
+        let sql = self.table.allinsert(lines);
         fs::write("db.log", &sql).unwrap();
-        let desc = format!("更新数据表{}，追加行数{}",self.table.name,lines);
-        let _ = self.db_builder.update(&sql,params,desc.as_str());
+        let desc = format!("插入数据表{}，追加行数{}",self.table.name,lines);
+        let _ = self.db_builder.run(&sql,params,desc.as_str());
         self.db_builder
     }
 }

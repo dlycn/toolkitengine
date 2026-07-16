@@ -105,7 +105,11 @@ impl<T: Serialize + 'static> Table<T> {
         }
     }
 
-    pub fn  update(&self,lines:usize) ->String{
+    pub fn fixupdate(&self,pk:&str,rown:&str,pkn:&str) -> String{
+        format!("UPDATE {} SET {} = ? WHERE {} = {}",self.name,rown,pk,pkn)
+    }
+
+    pub fn  allinsert(&self,lines:usize) ->String{
         let rows = self.table_rown();
         let coins: Vec<String>= rows.iter().map(|_|format!("?")).collect();
         let bath = format!("({})", coins.join(","));
@@ -115,6 +119,10 @@ impl<T: Serialize + 'static> Table<T> {
 
     pub fn drop(&self) ->String{
         format!("DROP TABLE IF EXISTS {};",self.name)
+    }
+
+    pub fn delete(&self,pk:&str,pkn:&str)->String{
+        format!("DELETE FROM {} WHERE {} = {};",self.name,pk,pkn)
     }
 
     fn build(&self) -> Tablemeta {

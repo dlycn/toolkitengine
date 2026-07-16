@@ -1,11 +1,15 @@
 use reqwest::Client;
-use serde::Serialize;
 use std::collections::HashMap;
 
-pub use resd::Role;
-
-use crate::nwsc::{self, resd};
+pub use resdata::Role;
+use serde::*;
+use crate::dbmg::tfm::Table;
+use crate::dbmg::{Dbmbuilder};
+use crate::nwsc::resdata::{Resfix, Work};
+use crate::nwsc::{self, resdata};
 use crate::resp::UrlBuild as UB;
+
+use futures::stream::StreamExt;
 
 pub fn meta_init() -> HashMap<String, Vec<String>> {
     let mut h = HashMap::new();
@@ -21,37 +25,110 @@ pub fn meta_init() -> HashMap<String, Vec<String>> {
 }
 
 pub trait Querysys{
-    fn sysqp(data: HashMap<String, Vec<String>>) -> QueryParam;
+    fn sysqp(data: HashMap<String, Vec<String>>)->QueryParam;
+    fn query(qp: &mut QueryParam);
 }
 
 impl Querysys for Role {
     fn sysqp(data: HashMap<String, Vec<String>>) -> QueryParam {
     let mode = Nmode::new("精灵", data);
-    let mut para = QueryParam::new(mode);
-    para.add_query("ID")
-        .add_query("名称")
-        .add_query("属性")
-        .add_query("性别")
-        .add_query("攻击")
-        .add_query("防御")
-        .add_query("特攻")
-        .add_query("特防")   
-        .add_query("速度")
-        .add_query("体力")     
-        .add_query("总能力值")
-        .add_query("精灵定位");
+    let para = QueryParam::new(mode);
     para
     }
-    
+
+    fn query(qp:&mut QueryParam){
+    qp.add_query("ID").add_query("名称").add_query("属性")
+    .add_query("性别").add_query("攻击").add_query("防御")
+    .add_query("特攻").add_query("特防").add_query("速度")
+    .add_query("体力").add_query("总能力值").add_query("精灵定位");
+    }
 }
+    
 
 pub struct Tasksys<T> {
     pub table: T,
     pub qp: QueryParam,
 }
-impl<T: Default + Querysys> Tasksys<T> {
+impl<T: Default + Querysys + Serialize + Work +'static> Tasksys<T> {
     pub fn from_data(data: HashMap<String, Vec<String>>) -> Self {
         Self { table: T::default(), qp: T::sysqp(data) }
+    }
+
+    pub fn num_query(&self)->QueryParam{
+        let mut qp = self.qp.clone();
+        qp.init.push_str("|format=count");
+        qp
+    }
+
+    pub fn base_query(&self)->QueryParam{
+        let mut qp = self.qp.clone();
+        T::query(&mut qp);
+        qp
+    }
+
+    pub fn apply_fix(self, table: &Table<T>, dbm: &mut Dbmbuilder) {
+        
+        let resfix:Resfix = self.table.fix();
+
+        for ((pk_col, row_col), updates) in resfix.update {
+            for (id, value) in updates {
+                dbm.on(table)
+                    .pk(pk_col)   // "id"
+                    .row(row_col) // "attr"
+                    .update(id.into(), [value]);
+            }
+        }
+
+        // 处理删除
+        for (col, id) in resfix.delete {
+            // 根据你的展示，col 总是 "id"，但保留灵活性
+            dbm.on(table)
+                .pk(col)
+                .delete(id.into());
+        }
+    }
+
+    pub async fn go_table_url(&self,lim:usize,ubc:reqwest::Client)->Vec<Vec<String>>{
+        let numdqp = self.num_query();
+        let text = numdqp.go();
+        let out = bech_api_url(&text, &ubc).await;
+        let strs = api_str(out);
+        let num: usize = strs[0].trim_end().parse().unwrap();
+
+        println!("{}", num);
+
+        let offsets: Vec<usize> = (0..num).step_by(lim).collect();
+
+        let results: Vec<String> = futures::stream::iter(offsets)
+            .map(|offset| {
+                let mut dqp = self.base_query();
+                dqp.add_param("ID", lim, offset);
+                let text = dqp.go();
+                let refd = &ubc;
+                async move {
+                    let out = bech_api_url(&text, refd).await;
+                    out
+                }
+            })
+            .buffered(5)
+            .collect::<Vec<_>>()
+            .await;
+
+        let resasys: Vec<Vec<String>> = results
+            .iter()
+            .map(|text| api_ags(text.to_string()))
+            .flatten()
+            .collect();
+
+        let res: Vec<Vec<String>> = resasys
+            .iter()
+            .map(|txt| txt.iter().skip(1).cloned().collect())
+            .collect();
+
+        res
+
+
+
     }
 }
 
@@ -115,7 +192,6 @@ pub async fn api_url(text: &str) -> String {
     let ubc = url_init().goclient();
     bech_api_url(text, &ubc).await}
 
-
 pub async fn bech_api_url(text: &str,ubc:&Client) -> String {
     println!("{text}");
     let mut ub = url_init();
@@ -130,11 +206,24 @@ pub async fn bech_api_url(text: &str,ubc:&Client) -> String {
     let text = nwsc::ayasurl(mainurl.as_str(), &ubc).await;
     text
 }
-pub fn api_ags(text: String) -> Vec<Vec<String>> {
+pub fn api_out(text: String) -> String {
     let v: serde_json::Value = serde_json::from_str(text.as_str()).unwrap();
 
     let txt = v["parse"]["text"]["*"].as_str().unwrap();
     std::fs::write("response.html", txt).unwrap();
+    txt.to_string()}
+
+pub fn api_str(text: String) -> Vec<String> {
+    let txt = api_out(text);
+    let doc = scraper::Html::parse_document(&txt);
+    let setp = scraper::Selector::parse("p").unwrap();
+    let body = doc.select(&setp).collect::<Vec<_>>();
+    body.iter().map(|i|{i.text().collect::<String>()}).collect::<Vec<_>>()
+}
+
+
+pub fn api_ags(text: String) -> Vec<Vec<String>> {
+    let txt = api_out(text);
     let doc = scraper::Html::parse_document(&txt);
     let setr = scraper::Selector::parse("tr").unwrap();
     let seth = scraper::Selector::parse("td").unwrap();
