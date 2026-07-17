@@ -11,21 +11,22 @@ async fn main() {
     let path = "./common/assetscrawler/assets.db";
     let mut dbm = DMB::connect(String::from(path)).unwrap();
     let data = task::meta_init();
-    let ubc: reqwest::Client = task::url_init().goclient();
+    let bugurl = task::url_init();
+    let ub =bugurl.api.get("seer").unwrap();
     let lim = 1000;
     let mut ofs = 0;
 
     let syst = task::Tasksys::<task::Role>::from_data(data);
-    let res = syst.go_table_url(lim, ubc).await;
+    let api = syst.go_table_url(ub,lim).await;
 
     let table = Table::new(syst.table.clone());
-    let max = res.len();
+    let max = api.len();
     dbm.transaction(true).unwrap();
     dbm.on(&table).pk("id").create();
     loop {
         let end = usize::min(ofs + lim + 1, max);
 
-        let iter = res[ofs..end]
+        let iter = api[ofs..end]
             .iter()
             .flat_map(|row| row.iter().map(|s| s as &dyn ToSql));
         let params = rusqlite::params_from_iter(iter);
@@ -37,5 +38,4 @@ async fn main() {
     }
     syst.apply_fix(&table, &mut dbm);
     dbm.transaction(false).unwrap();
-    println!("name:{}", table.name);
 }

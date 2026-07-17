@@ -1,5 +1,5 @@
 /target
 /assets
 /*.db
-/*.log
-/*.txt
+*.log
+*.txt

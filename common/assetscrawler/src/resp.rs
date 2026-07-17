@@ -1,7 +1,7 @@
 use reqwest::*;
 
 // resource_personal
-
+#[derive(Clone)]
 pub struct UrlBuild{
     pub main_path:String,
     pub child_path:Vec<String>,

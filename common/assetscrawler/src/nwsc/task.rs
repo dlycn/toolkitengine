@@ -88,10 +88,11 @@ impl<T: Default + Querysys + Serialize + Work +'static> Tasksys<T> {
         }
     }
 
-    pub async fn go_table_url(&self,lim:usize,ubc:reqwest::Client)->Vec<Vec<String>>{
+    pub async fn go_table_url(&self,ub:&UB,lim:usize)->Vec<Vec<String>>{
+        let ubc = ub.clone().goclient();
         let numdqp = self.num_query();
         let text = numdqp.go();
-        let out = bech_api_url(&text, &ubc).await;
+        let out = bech_api_url(ub.clone(),&text, &ubc).await;
         let strs = api_str(out);
         let num: usize = strs[0].trim_end().parse().unwrap();
 
@@ -105,8 +106,9 @@ impl<T: Default + Querysys + Serialize + Work +'static> Tasksys<T> {
                 dqp.add_param("ID", lim, offset);
                 let text = dqp.go();
                 let refd = &ubc;
+                let rub = ub.clone();
                 async move {
-                    let out = bech_api_url(&text, refd).await;
+                    let out = bech_api_url(rub,&text, refd).await;
                     out
                 }
             })
@@ -182,19 +184,32 @@ impl QueryParam {
     }
 }
 
-pub fn url_init()->UB{
-    let mut ub = UB::new("https://wiki.biligame.com/seer".to_string());
-    ub.add_path("/api.php".to_string()).use_path(1);
-    ub
+pub struct Bugurl{
+    pub res:HashMap<String,UB>,
+    pub api:HashMap<String,UB>
 }
 
-pub async fn api_url(text: &str) -> String {
-    let ubc = url_init().goclient();
-    bech_api_url(text, &ubc).await}
+impl Default for Bugurl{
+    fn default() -> Self {
+        Self { res: HashMap::new(), api: HashMap::new() }
+    }
+}
 
-pub async fn bech_api_url(text: &str,ubc:&Client) -> String {
+pub fn url_init()->Bugurl{
+    let mut bu = Bugurl::default();
+    bu.api
+    .entry("seer".to_string())
+    .insert_entry(UB::new("https://wiki.biligame.com/seer".to_string()));
+    bu.api.get_mut("seer").unwrap().add_path("/api.php".to_string()).use_path(1);
+    bu
+}
+
+pub async fn api_url(ub:UB,text: &str) -> String {
+    let ubc = ub.goclient();
+    bech_api_url(ub,text, &ubc).await}
+
+pub async fn bech_api_url(mut ub:UB,text: &str,ubc:&Client) -> String {
     println!("{text}");
-    let mut ub = url_init();
     let url = &ub.gourl();
     let mut mainurl = url.clone();
     mainurl
