@@ -372,15 +372,16 @@ pub fn res_ags(text: String, selectormap: HashMap<String, String>) -> Vec<Vec<St
 
 
 
-/// 从多个 HTML 标签字符串中提取指定属性的值
+/// Extract specified attribute values from multiple HTML tag strings
 /// 
-/// # 参数
-/// - `elements`: 包含标签字符串的 Vec，每个字符串应为一个完整的标签（如 `<img src="..." alt="...">`）
-/// - `attrs`: 要提取的属性名列表（顺序决定输出顺序）
+/// # Parameters
+/// - `elements`: A Vec containing tag strings, each string should be a complete tag (e.g., `<img src="..." alt="...">`)
+/// - `attrs`: A list of attribute names to extract (order determines the output order)
 /// 
-/// # 返回
-/// `Vec<Vec<String>>`，与 `elements` 顺序相同，每个内部向量长度等于 `attrs.len()`，
-/// 依次存放对应属性值；若某标签不包含该属性，则对应位置为空字符串。
+/// # Returns
+/// `Vec<Vec<String>>` in the same order as `elements`, each inner vector length equals `attrs.len()`,
+/// sequentially storing corresponding attribute values; if a tag does not contain the attribute, the corresponding position is an empty string.
+
 pub fn extract_attrs(elements: Vec<String>, attrs: Vec<String>) -> Vec<Vec<String>> {
     let mut results = Vec::with_capacity(elements.len());
 
