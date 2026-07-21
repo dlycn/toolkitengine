@@ -1,6 +1,5 @@
 /target
 /assets
-/*.db
-/*.log
-/*.txt
-/*.html
+**/*.log
+**/*.txt
+**/*.html
