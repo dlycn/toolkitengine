@@ -16,10 +16,10 @@ fn spawn_camera(mut commands: Commands) {
 }
 
 fn spawn_texture_display(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let png_texture = asset_server.load("imgs/test.png");
-    let ktx2_texture = asset_server.load("imgs/test.basisu.ktx2");
-    let dds_texture = asset_server.load("imgs/test.dds");
-    let default_font = asset_server.load("fonts/simkai.ttf");
+    let png_texture: Handle<Image> = asset_server.load("imgs/test.png");
+    let ktx2_texture: Handle<Image> = asset_server.load("imgs/test.basisu.ktx2");
+    let dds_texture: Handle<Image> = asset_server.load("imgs/test.dds");
+    let default_font: Handle<Font> = asset_server.load("fonts/source han sans.otf");
 
     commands
         .spawn(Node {
@@ -30,9 +30,9 @@ fn spawn_texture_display(mut commands: Commands, asset_server: Res<AssetServer>)
             grid_template_rows: RepeatedGridTrack::flex(2, 1.0),
             justify_items: JustifyItems::Center,
             align_items: AlignItems::Center,
-            row_gap: Val::Px(20.0),
-            column_gap: Val::Px(20.0),
-            padding: UiRect::all(Val::Px(20.0)),
+            row_gap: Val::Px(2.0),
+            column_gap: Val::Px(2.0),
+            padding: UiRect::all(Val::Px(2.0)),
             ..default()
         })
         .with_children(|parent| {
@@ -50,7 +50,7 @@ fn spawn_texture_display(mut commands: Commands, asset_server: Res<AssetServer>)
             );
             create_texture_card(
                 parent,
-                "DDS 纹理",
+                "Hello 你好 烏龜 черепаха カメ 거북이 龟 Schildkröte ♈♉♊♋♌♍♎♏♐♑♒♓ ☰ ䷀ ⌘ ₿ ∞ 🀀 🀁 🀂 🀃 ㄅ ㄆ ㄇ ㄈ ㄉ ㄊ རུས་སྦལ་",
                 dds_texture,
                 default_font.clone(),
             );
@@ -67,10 +67,10 @@ fn create_texture_card(
         .spawn(Node {
             flex_direction: FlexDirection::Column,
             align_items: AlignItems::Center,
-            row_gap: Val::Percent(10.0),
+            row_gap: Val::Percent(5.0),
             justify_content: JustifyContent::Center,
             width: Val::Percent(90.0),
-            height: Val::Percent(90.0),
+            height: Val::Percent(100.0),
             ..default()
         })
         .with_children(|p| {
@@ -79,6 +79,7 @@ fn create_texture_card(
                 TextFont {
                     font: FontSource::Handle(font.clone()),
                     font_size: FontSize::Px(24.0),
+                    style: FontStyle::Italic,
                     ..default()
                 },
                 TextColor(Color::WHITE),
@@ -87,11 +88,12 @@ fn create_texture_card(
             p.spawn((
                 ImageNode::new(texture),
                 Node {
-                    width: Val::Percent(80.0),
+                    width: Val::Percent(40.0),
                     max_width: Val::Px(400.0),
                     aspect_ratio: Some(1.0),
                     ..default()
                 },
             ));
         });
+
 }

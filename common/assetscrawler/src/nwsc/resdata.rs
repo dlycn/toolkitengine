@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use serde::Serialize;
 #[derive(Serialize, Debug, Clone)]
-pub struct Role {
-    pub id: u16,
+pub struct PetData {
+    pub id: u32,
     pub name: String,
     pub attr: String,
     pub gender: String,
@@ -17,25 +17,42 @@ pub struct Role {
     pub post:String
 }
 
+#[derive(Serialize, Debug, Clone)]
+pub struct PetSkin {
+    pub id: u16,
+    pub name: String,
+    pub kind: String,
+    pub bind: u32
+}
+
+
 pub struct Resfix {
-    pub update: HashMap<(&'static str, &'static str), Vec<(&'static str, &'static str)>>,
+    pub update: HashMap<(&'static str, &'static str), Vec<(String,String)>>,
     pub delete: Vec<(&'static str, &'static str)>,
 }
 
 
 
 pub trait Work {
-    fn fix(self)->Resfix;
+    fn fix(&self)->Resfix{
+        Resfix::default()
+    }
 }
 
-impl Work for Role {
-    fn fix(self) -> Resfix {
+impl Work for PetSkin {
+    fn fix(&self) -> Resfix {
         let mut res = Resfix::default();
+        res.update.entry(("id","kind"))
+        .or_insert([1400771,1400775,1400792,1400798,1400805,1400813,1400818,1400832,1400833,1400834,1400854,1400644,1400644,1400645,1400653,1400654,1400655,1400658,1400659,1400660,1400692,1400740,1400749]
+            .iter().map(|i|{(i.to_string(),"传说".to_string())}).collect::<Vec<(String,String)>>());
+        res.update.get_mut(&("id","kind")).unwrap().push(("1400310".into(),"经典".into()));
+        res
+    }
+}
 
-        // let k = update
-        //     .entry(("id", "attr"))
-        //     .or_insert_with(Vec::new);
-        // k.push(("3228", "王系"));
+impl Work for PetData {
+    fn fix(&self) -> Resfix {
+        let mut res = Resfix::default();
 
         res.delete.push(("id", "3228"));
         res.delete.push(("id", "3229"));
@@ -45,7 +62,17 @@ impl Work for Role {
     }
 }
 
-impl Default for Role {
+impl Default for PetSkin {
+    fn default() -> Self {
+        Self { id: 0, 
+            name: "未知".into(), 
+            kind: "未知类型".into(),
+            bind: 0
+        }
+    }
+}
+
+impl Default for PetData {
     fn default() -> Self {
         Self { id: 0, 
             name: "未知".into(), 

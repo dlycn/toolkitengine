@@ -109,9 +109,13 @@ impl<T: Serialize + 'static> Table<T> {
         format!("UPDATE {} SET {} = ? WHERE {} = {}",self.name,rown,pk,pkn)
     }
 
-    pub fn  allinsert(&self,lines:usize) ->String{
-        let rows = self.table_rown();
+    pub fn  allinsert(&self,lines:usize,cut:Option<usize>) ->String{
+        let mut rows = self.table_rown();
+        if let Some(cutindex) = cut {
+            rows.truncate(cutindex);
+        };
         let coins: Vec<String>= rows.iter().map(|_|format!("?")).collect();
+
         let bath = format!("({})", coins.join(","));
         let coinlines = vec![bath; lines].join(", ");
         format!("INSERT OR REPLACE INTO {} ({}) VALUES {}",self.name,rows.join(", "), coinlines)

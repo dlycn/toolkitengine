@@ -121,10 +121,10 @@ impl<'a, T: Serialize + 'static> TableOperator<'a, T> {
     }
 
     // 插入数据
-    pub fn append<P: Params>(self,lines:usize,params:P) -> &'a mut Dbmbuilder {
-        let sql = self.table.allinsert(lines);
-        fs::write("db.log", &sql).unwrap();
+    pub fn append<P: Params>(self,lines:usize,params:P,cut:Option<usize>) -> &'a mut Dbmbuilder {
         let desc = format!("插入数据表{}，追加行数{}",self.table.name,lines);
+        let sql = self.table.allinsert(lines,cut);
+        fs::write("db.log", &sql).unwrap();
         let _ = self.db_builder.run(&sql,params,desc.as_str());
         self.db_builder
     }

@@ -1,13 +1,13 @@
 use reqwest::Client;
 use std::collections::HashMap;
 
-pub use resdata::Role;
-use serde::*;
+use crate::dbmg::Dbmbuilder;
 use crate::dbmg::tfm::Table;
-use crate::dbmg::{Dbmbuilder};
 use crate::nwsc::resdata::{Resfix, Work};
 use crate::nwsc::{self, resdata};
 use crate::resp::UrlBuild as UB;
+pub use resdata::*;
+use serde::*;
 
 use futures::stream::StreamExt;
 
@@ -15,8 +15,12 @@ pub fn meta_init() -> HashMap<String, Vec<String>> {
     let mut h = HashMap::new();
     let m = [[
         "精灵",
-        "名称,ID,系列名称,精灵定位,性别,状态,攻击,防御,特攻,特防,速度,体力,总能力值,属性",
-    ]];
+        "名称,ID,系列名称,精灵定位,性别,状态,攻击,特攻,防御,特防,速度,体力,总能力值,属性",
+    ],
+    [
+        "皮肤",
+        "名称,ID,type,类型,状态",]
+];
     for [k, t] in m {
         let v = t.split(",").map(String::from).collect::<Vec<String>>();
         h.insert(k.to_string(), v);
@@ -24,56 +28,79 @@ pub fn meta_init() -> HashMap<String, Vec<String>> {
     h
 }
 
-pub trait Querysys{
-    fn sysqp(data: HashMap<String, Vec<String>>)->QueryParam;
+pub trait Querysys {
+    fn sysqp(data: HashMap<String, Vec<String>>) -> QueryParam;
     fn query(qp: &mut QueryParam);
 }
 
-impl Querysys for Role {
+impl Querysys for PetSkin {
     fn sysqp(data: HashMap<String, Vec<String>>) -> QueryParam {
-    let mode = Nmode::new("精灵", data);
-    let para = QueryParam::new(mode);
-    para
+        let mode = Nmode::new("皮肤", data);
+        let para = QueryParam::new(mode);
+        para
     }
 
-    fn query(qp:&mut QueryParam){
-    qp.add_query("ID").add_query("名称").add_query("属性")
-    .add_query("性别").add_query("攻击").add_query("防御")
-    .add_query("特攻").add_query("特防").add_query("速度")
-    .add_query("体力").add_query("总能力值").add_query("精灵定位");
+    fn query(qp: &mut QueryParam) {
+        qp.add_query("ID")
+            .add_query("名称")
+            .add_query("类型");
     }
 }
-    
+
+impl Querysys for PetData {
+    fn sysqp(data: HashMap<String, Vec<String>>) -> QueryParam {
+        let mode = Nmode::new("精灵", data);
+        let para = QueryParam::new(mode);
+        para
+    }
+
+    fn query(qp: &mut QueryParam) {
+        qp.add_query("ID")
+            .add_query("名称")
+            .add_query("属性")
+            .add_query("性别")
+            .add_query("攻击")
+            .add_query("特攻")
+            .add_query("防御")
+            .add_query("特防")
+            .add_query("速度")
+            .add_query("体力")
+            .add_query("总能力值")
+            .add_query("精灵定位");
+    }
+}
 
 pub struct Tasksys<T> {
     pub table: T,
     pub qp: QueryParam,
 }
-impl<T: Default + Querysys + Serialize + Work +'static> Tasksys<T> {
+impl<T: Default + Querysys + Serialize + Work + 'static> Tasksys<T> {
     pub fn from_data(data: HashMap<String, Vec<String>>) -> Self {
-        Self { table: T::default(), qp: T::sysqp(data) }
+        Self {
+            table: T::default(),
+            qp: T::sysqp(data),
+        }
     }
 
-    pub fn num_query(&self)->QueryParam{
+    pub fn num_query(&self) -> QueryParam {
         let mut qp = self.qp.clone();
         qp.init.push_str("|format=count");
         qp
     }
 
-    pub fn base_query(&self)->QueryParam{
+    pub fn base_query(&self) -> QueryParam {
         let mut qp = self.qp.clone();
         T::query(&mut qp);
         qp
     }
 
     pub fn apply_fix(self, table: &Table<T>, dbm: &mut Dbmbuilder) {
-        
-        let resfix:Resfix = self.table.fix();
+        let resfix: Resfix = self.table.fix();
 
         for ((pk_col, row_col), updates) in resfix.update {
             for (id, value) in updates {
                 dbm.on(table)
-                    .pk(pk_col)   // "id"
+                    .pk(pk_col) // "id"
                     .row(row_col) // "attr"
                     .update(id.into(), [value]);
             }
@@ -82,17 +109,15 @@ impl<T: Default + Querysys + Serialize + Work +'static> Tasksys<T> {
         // 处理删除
         for (col, id) in resfix.delete {
             // 根据你的展示，col 总是 "id"，但保留灵活性
-            dbm.on(table)
-                .pk(col)
-                .delete(id.into());
+            dbm.on(table).pk(col).delete(id.into());
         }
     }
 
-    pub async fn go_table_url(&self,ub:&UB,lim:usize)->Vec<Vec<String>>{
+    pub async fn go_table_url(&self, ub: &UB, lim: usize) -> Vec<Vec<String>> {
         let ubc = ub.clone().goclient();
         let numdqp = self.num_query();
         let text = numdqp.go();
-        let out = bech_api_url(ub.clone(),&text, &ubc).await;
+        let out = bech_api_url(ub.clone(), &text, &ubc).await;
         let strs = api_str(out);
         let num: usize = strs[0].trim_end().parse().unwrap();
 
@@ -108,7 +133,7 @@ impl<T: Default + Querysys + Serialize + Work +'static> Tasksys<T> {
                 let refd = &ubc;
                 let rub = ub.clone();
                 async move {
-                    let out = bech_api_url(rub,&text, refd).await;
+                    let out = bech_api_url(rub, &text, refd).await;
                     out
                 }
             })
@@ -124,15 +149,49 @@ impl<T: Default + Querysys + Serialize + Work +'static> Tasksys<T> {
 
         let res: Vec<Vec<String>> = resasys
             .iter()
-            .map(|txt| txt.iter().skip(1).cloned().collect())
+            .map(|txt: &Vec<String>| txt.iter().skip(1).cloned().collect())
+            .filter(|row: &Vec<String>| !row.is_empty()) 
             .collect();
+        
+        let f = format!("Outout.json");
 
+        tokio::fs::write(f, format!("{:?}", res)).await.unwrap();
         res
-
-
-
     }
 }
+
+pub async fn go_dlink_resource(ubres: &UB, iter: Vec<u32>, localpath: String, format: &str) {
+    let ubc = ubres.goclient();
+    let result = futures::stream::iter(iter)
+        .map(|v| {
+            let mut o = localpath.clone();
+            let c = &ubc;
+
+            let f = format!("/{}.{}", v, format);
+            let mut ub = ubres.clone();
+            async move {
+                let p = ub.mod_path(&f);
+                o.push_str(f.as_str());
+                let opt = nwsc::goresurl(c, p.main_path.as_str(), o.as_str()).await;
+                (v, opt)
+            }
+        })
+        .buffered(20)
+        .collect::<Vec<(u32, bool)>>()
+        .await;
+
+    let out = result
+        .iter()
+        .filter_map(|s| if !s.1 { Some(s.0) } else { None })
+        .collect::<Vec<u32>>();
+
+    let f = format!("{}Outout.json",localpath);
+
+    tokio::fs::write(f, format!("{:?}", out)).await.unwrap();
+}
+
+pub async fn go_group_resource(ubres: &UB, iter: Vec<u32>, localpath: String, format: &str) {
+    let ubc = ubres.goclient();}
 
 #[derive(Clone)]
 pub struct Nmode {
@@ -184,31 +243,57 @@ impl QueryParam {
     }
 }
 
-pub struct Bugurl{
-    pub res:HashMap<String,UB>,
-    pub api:HashMap<String,UB>
+pub struct Bugurl {
+    pub res: HashMap<String, UB>,
+    pub api: HashMap<String, UB>,
 }
 
-impl Default for Bugurl{
+impl Default for Bugurl {
     fn default() -> Self {
-        Self { res: HashMap::new(), api: HashMap::new() }
+        Self {
+            res: HashMap::new(),
+            api: HashMap::new(),
+        }
     }
 }
 
-pub fn url_init()->Bugurl{
+pub fn url_init() -> Bugurl {
     let mut bu = Bugurl::default();
     bu.api
-    .entry("seer".to_string())
-    .insert_entry(UB::new("https://wiki.biligame.com/seer".to_string()));
-    bu.api.get_mut("seer").unwrap().add_path("/api.php".to_string()).use_path(1);
+        .entry("seer.api".to_string())
+        .insert_entry(UB::new("https://wiki.biligame.com/seer".to_string()));
+    bu.api
+        .get_mut("seer.api")
+        .unwrap()
+        .add_path("/api.php".to_string())
+        .use_path(1);
+    bu.res.entry("seer.h5.res".to_string()).insert_entry(UB::new(
+        "https://seerh5.61.com/resource/assets/fightResource/pet".to_string(),
+    ));
+    
+    bu.res
+        .get_mut("seer.h5.res")
+        .unwrap()
+        .use_path(0);
+    
+    bu.res.entry("seer.flash.res".to_string()).insert_entry(UB::new(
+        "https://seer.61.com/resource/fightResource/pet".to_string(),
+    ));
+    bu.res
+        .get_mut("seer.flash.res")
+        .unwrap()
+        .add_path("/swf".to_string())
+        .use_path(1);
+
     bu
 }
 
-pub async fn api_url(ub:UB,text: &str) -> String {
+pub async fn api_url(ub: UB, text: &str) -> String {
     let ubc = ub.goclient();
-    bech_api_url(ub,text, &ubc).await}
+    bech_api_url(ub, text, &ubc).await
+}
 
-pub async fn bech_api_url(mut ub:UB,text: &str,ubc:&Client) -> String {
+pub async fn bech_api_url(mut ub: UB, text: &str, ubc: &Client) -> String {
     println!("{text}");
     let url = &ub.gourl();
     let mut mainurl = url.clone();
@@ -226,16 +311,18 @@ pub fn api_out(text: String) -> String {
 
     let txt = v["parse"]["text"]["*"].as_str().unwrap();
     std::fs::write("response.html", txt).unwrap();
-    txt.to_string()}
+    txt.to_string()
+}
 
 pub fn api_str(text: String) -> Vec<String> {
     let txt = api_out(text);
     let doc = scraper::Html::parse_document(&txt);
     let setp = scraper::Selector::parse("p").unwrap();
     let body = doc.select(&setp).collect::<Vec<_>>();
-    body.iter().map(|i|{i.text().collect::<String>()}).collect::<Vec<_>>()
+    body.iter()
+        .map(|i| i.text().collect::<String>())
+        .collect::<Vec<_>>()
 }
-
 
 pub fn api_ags(text: String) -> Vec<Vec<String>> {
     let txt = api_out(text);
@@ -250,7 +337,74 @@ pub fn api_ags(text: String) -> Vec<Vec<String>> {
             .iter()
             .map(|i| i.text().next().map(String::from).unwrap_or_default())
             .collect::<Vec<_>>();
-        if !p.is_empty(){optvec.push(p)};
+        if !p.is_empty() {
+            optvec.push(p)
+        };
     }
     optvec
+}
+
+use scraper::Selector as Selector;
+
+pub fn res_ags(text: String, selectormap: HashMap<String, String>) -> Vec<Vec<String>> {
+    let l = selectormap.len();
+    let mut o = vec![Vec::new(); l];          // 需要 mut 以便修改
+    let d = scraper::Selector::parse("root > *").unwrap();
+    let doc = scraper::Html::parse_document(&text);
+
+    for (n, (k, v)) in selectormap.iter().enumerate() {
+        let setk = Selector::parse(k.as_str()).unwrap_or_else(|_| d.clone());
+        let setv = Selector::parse(v.as_str()).unwrap_or_else(|_| d.clone());
+
+        if setk != d && setv != d {
+            // 1. 先按键选择器定位元素
+            for element in doc.select(&setk) {
+                // 2. 在定位到的元素内部，按值选择器提取内容
+                for child in element.select(&setv) {
+                    let extracted = child.text().collect::<String>();
+                    o[n].push(extracted);
+                }
+            }
+        }
+    }
+    o
+}
+
+
+
+/// 从多个 HTML 标签字符串中提取指定属性的值
+/// 
+/// # 参数
+/// - `elements`: 包含标签字符串的 Vec，每个字符串应为一个完整的标签（如 `<img src="..." alt="...">`）
+/// - `attrs`: 要提取的属性名列表（顺序决定输出顺序）
+/// 
+/// # 返回
+/// `Vec<Vec<String>>`，与 `elements` 顺序相同，每个内部向量长度等于 `attrs.len()`，
+/// 依次存放对应属性值；若某标签不包含该属性，则对应位置为空字符串。
+pub fn extract_attrs(elements: Vec<String>, attrs: Vec<String>) -> Vec<Vec<String>> {
+    let mut results = Vec::with_capacity(elements.len());
+
+    // 构造一个选择器，用于定位包装后的根元素下的第一个子元素
+    let root_selector = Selector::parse("root > *").unwrap(); // 只取第一个直接子元素
+
+    for elem_str in elements {
+        // 将标签包裹在 <root> 中，使其成为合法的文档片段
+        let doc = scraper::Html::parse_document(&format!("<root>{}</root>", elem_str));
+        let mut row = Vec::with_capacity(attrs.len());
+
+        // 尝试定位到该标签
+        if let Some(element) = doc.select(&root_selector).next() {
+            // 提取每个属性
+            for attr_name in &attrs {
+                let value = element.value().attr(attr_name).unwrap_or("").to_string();
+                row.push(value);
+            }
+        } else {
+            // 如果无法解析（例如空字符串或格式错误），则填充空字符串
+            row.resize(attrs.len(), String::new());
+        }
+        results.push(row);
+    }
+
+    results
 }

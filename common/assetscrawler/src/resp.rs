@@ -1,7 +1,7 @@
 use reqwest::*;
 
 // resource_personal
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub struct UrlBuild{
     pub main_path:String,
     pub child_path:Vec<String>,
@@ -20,13 +20,23 @@ impl UrlBuild{
         self.child_path.push(urlc);
         self
     }
-    pub fn use_path(&mut self,num:usize)->&mut Self {
-        let n = self.child_path.len();
-        if n+1>=num{self.main_path.push_str(self.child_path[num].as_str())};
+
+
+    ///- jsut like X.mod_path("/xxx")
+    pub fn mod_path(&mut self,curl:&str)->&mut Self {
+        self.main_path.push_str(curl);
         self
     }
-    pub fn backup(&mut self)->&mut Self {
-        self.main_path=self.child_path[0].clone();
+
+    pub fn use_path(&mut self,num:usize)->&mut Self {
+        let n = self.child_path.len();
+        if num == 0{self.backup(num)} else {
+            if n+1>=num{
+                self.main_path.push_str(self.child_path[num].as_str())}
+        self}
+    }
+    pub fn backup(&mut self,num:usize)->&mut Self {
+        self.main_path=self.child_path[num].clone();
         self
     }
 
@@ -37,7 +47,7 @@ impl UrlBuild{
     pub fn goclient(&self)->Client{
         let mut clientbuilder = reqwest::Client::builder()
         .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3 Edg/150.0.0.0")
-        .timeout(std::time::Duration::from_secs(16));
+        .timeout(std::time::Duration::from_secs(64));
         let mut headers = if 
         let Some(h) = &self.headers {
             h.clone()
