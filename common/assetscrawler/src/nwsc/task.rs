@@ -1,4 +1,5 @@
 use reqwest::Client;
+use rusqlite::ToSql;
 use std::collections::HashMap;
 
 use crate::dbmg::Dbmbuilder;
@@ -6,6 +7,7 @@ use crate::dbmg::tfm::Table;
 use crate::nwsc::resdata::{Resfix, Work};
 use crate::nwsc::{self, resdata};
 use crate::resp::UrlBuild as UB;
+
 pub use resdata::*;
 use serde::*;
 
@@ -74,7 +76,7 @@ pub struct Tasksys<T> {
     pub table: T,
     pub qp: QueryParam,
 }
-impl<T: Default + Querysys + Serialize + Work + 'static> Tasksys<T> {
+impl<T: Default + Querysys + Serialize + Work + 'static + Clone> Tasksys<T> {
     pub fn from_data(data: HashMap<String, Vec<String>>) -> Self {
         Self {
             table: T::default(),
@@ -158,6 +160,33 @@ impl<T: Default + Querysys + Serialize + Work + 'static> Tasksys<T> {
         tokio::fs::write(f, format!("{:?}", res)).await.unwrap();
         res
     }
+
+    pub async fn out_table_db(self,mut dbm: Dbmbuilder,ubapi:&UB,mut ofs: usize,lim: usize){
+        let api = self.go_table_url(ubapi,lim).await;
+        let table = Table::new(self.table.clone());
+        let max = api.len();
+        dbm.transaction(true).unwrap();
+        dbm.on(&table).pk("id").create();
+        loop {
+            let end = usize::min(ofs + lim, max);
+            println!("{},{}",end,ofs);
+            let iter = api[ofs..end]
+                .iter()
+                .flat_map(|row| row.iter().map(|s| s as &dyn ToSql));
+            let params = rusqlite::params_from_iter(iter);
+            dbm.on(&table).append(end - ofs, params,Option::Some(3));
+
+        
+
+            if end == max {
+                break;
+            }
+            ofs += lim
+        }
+        self.apply_fix(&table, &mut dbm);
+        dbm.transaction(false).unwrap();
+    }
+
 }
 
 pub async fn go_dlink_resource(ubres: &UB, iter: Vec<u32>, localpath: String, format: &str) {
