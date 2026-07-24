@@ -12,6 +12,19 @@ mod res_setting;
 use bevy::prelude::*;
 use res_setting::*;
 
+#[derive(Debug, Clone)]
+pub struct SetInit {
+    pub log: Setlog,
+}
+
+impl Default for SetInit {
+    fn default() -> Self {
+        SetInit {
+            log: Setlog::default(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Resource)]
 pub struct Setting {
     pub interface: Setinterface,
@@ -21,7 +34,7 @@ pub struct Setting {
 impl Default for Setting {
     fn default() -> Self {
         Setting {
-            interface: INTERFACE,
+            interface: Setinterface::default(),
             info: Setinfo::default(),
         }
     }

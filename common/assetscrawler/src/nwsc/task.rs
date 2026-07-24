@@ -16,13 +16,8 @@ use futures::stream::StreamExt;
 pub fn meta_init() -> HashMap<String, Vec<String>> {
     let mut h = HashMap::new();
     let m = [[
-        "精灵",
-        "名称,ID,系列名称,精灵定位,性别,状态,攻击,特攻,防御,特防,速度,体力,总能力值,属性",
-    ],
-    [
-        "皮肤",
-        "名称,ID,type,类型,状态",]
-];
+        "精灵","名称,ID,系列名称,精灵定位,性别,状态,攻击,特攻,防御,特防,速度,体力,总能力值,属性",],[
+        "皮肤","名称,ID,type,类型,状态",]];
     for [k, t] in m {
         let v = t.split(",").map(String::from).collect::<Vec<String>>();
         h.insert(k.to_string(), v);
@@ -390,7 +385,7 @@ pub fn res_ags(text: String, selectormap: HashMap<String, String>) -> Vec<Vec<St
             for element in doc.select(&setk) {
                 // 2. 在定位到的元素内部，按值选择器提取内容
                 for child in element.select(&setv) {
-                    let extracted = child.text().collect::<String>();
+                    let extracted = child.html();
                     o[n].push(extracted);
                 }
             }
@@ -398,18 +393,6 @@ pub fn res_ags(text: String, selectormap: HashMap<String, String>) -> Vec<Vec<St
     }
     o
 }
-
-
-
-/// Extract specified attribute values from multiple HTML tag strings
-/// 
-/// # Parameters
-/// - `elements`: A Vec containing tag strings, each string should be a complete tag (e.g., `<img src="..." alt="...">`)
-/// - `attrs`: A list of attribute names to extract (order determines the output order)
-/// 
-/// # Returns
-/// `Vec<Vec<String>>` in the same order as `elements`, each inner vector length equals `attrs.len()`,
-/// sequentially storing corresponding attribute values; if a tag does not contain the attribute, the corresponding position is an empty string.
 
 pub fn extract_attrs(elements: Vec<String>, attrs: Vec<String>) -> Vec<Vec<String>> {
     let mut results = Vec::with_capacity(elements.len());

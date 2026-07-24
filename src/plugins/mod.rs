@@ -3,6 +3,7 @@ use super::configs::*;
 use super::events::*;
 use super::scripts::*;
 
+use bevy::log::LogPlugin;
 use res_hello::*;
 use res_sync::*;
 
@@ -28,17 +29,21 @@ impl Plugin for SystemPlugin {
     fn build(&self, app: &mut App) {
         app
         .insert_resource(RControl::default())
-        .add_systems(Startup, (system_ini,test_mesh).chain())
-        .add_systems(Update, gorotate)
+        .add_systems(Startup, system_ini)
         .add_systems(PostUpdate,kmcontrol::control);
     }
 }
 
+
+
 impl Plugin for InitPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(DefaultPlugins);
+        let setinit:SetInit = SetInit::default();
+        app.add_plugins(DefaultPlugins.set(LogPlugin{
+            level:setinit.log.level,
+            filter:setinit.log.filter,..default()}));
         app.add_observer(setwindows::e_setting);
-        app.insert_resource(WinitSettings::continuous());
+        app.insert_resource(WinitSettings::game());
         app.insert_resource(Setting::default());
         app.add_systems(Startup, apply_setting);
     }

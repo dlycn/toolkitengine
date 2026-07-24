@@ -25,6 +25,11 @@ pub struct PetSkin {
     pub bind: u32
 }
 
+#[derive(Serialize, Debug, Clone)]
+pub struct ResData {
+    pub alt: String,
+    pub src: String,
+}
 
 pub struct Resfix {
     pub update: HashMap<(&'static str, &'static str), Vec<(String,String)>>,
@@ -61,6 +66,22 @@ impl Work for PetData {
         res
     }
 }
+
+impl Work for ResData {
+    fn fix(&self) -> Resfix {
+        Resfix::default()}
+
+}
+
+impl Default for ResData {
+    fn default() -> Self {
+        Self {
+            alt: "未知".into(), 
+            src: "未知".into(),
+        }
+    }
+}
+
 
 impl Default for PetSkin {
     fn default() -> Self {

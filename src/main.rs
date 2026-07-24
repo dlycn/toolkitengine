@@ -3,8 +3,12 @@ mod plugins;
 mod scripts;
 mod components;
 mod events;
+
+
 use bevy::prelude::*;
 use plugins::*;
+
+
 fn main() {
 
     App::new()

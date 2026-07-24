@@ -68,7 +68,7 @@ impl<'a, T: Serialize + 'static> TableOperator<'a, T> {
     }
 
     pub fn row(mut self, row: &str) -> Self {
-        let r = row.to_string();
+        let r = String::from(row);
         if self.table.table_rown().contains(&r){
             self.rowname = Some(r);}
     self
