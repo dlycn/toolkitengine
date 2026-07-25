@@ -29,6 +29,7 @@ impl Plugin for SystemPlugin {
     fn build(&self, app: &mut App) {
         app
         .insert_resource(RControl::default())
+        .add_observer(e_setlod)
         .add_systems(Startup, system_ini)
         .add_systems(PostUpdate,kmcontrol::control);
     }
@@ -39,6 +40,7 @@ impl Plugin for SystemPlugin {
 impl Plugin for InitPlugin {
     fn build(&self, app: &mut App) {
         let setinit:SetInit = SetInit::default();
+        debug_once!("{:#?}",setinit);
         app.add_plugins(DefaultPlugins.set(LogPlugin{
             level:setinit.log.level,
             filter:setinit.log.filter,..default()}));

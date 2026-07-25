@@ -1,6 +1,7 @@
 mod configs;
 mod plugins;
 mod scripts;
+mod entities;
 mod components;
 mod events;
 

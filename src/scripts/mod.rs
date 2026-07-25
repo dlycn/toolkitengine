@@ -10,16 +10,18 @@ pub mod kmcontrol;
 
 pub fn system_ini(mut commands: Commands) {
     commands.spawn((
-        Camera2d,Camera::default(),Cselect));
+        Camera2d,Camera::default(),Transform{..Default::default()},Cselect));
 }
 
-pub fn add_people(mut commands: Commands) {
-    commands.spawn((Cperson, Cname("Elaina Proctor".to_string())));
-    commands.spawn((Cperson, Cname("Renzo Hume".to_string())));
-    commands.spawn((Cperson, Cname("Zayna Nieves".to_string())));
+pub fn add_people(mut commands: Commands,asset_server: Res<AssetServer>) {
+    commands.spawn((Cpet, Cname("Elaina Proctor".to_string()),
+    Sprite{image: asset_server.load("imgs/Tachies/1.png"),
+    custom_size: Some(Vec2::splat(64f32)),..default()}));
+    commands.spawn((Cpet, Cname("Renzo Hume".to_string())));
+    commands.spawn((Cpet, Cname("Zayna Nieves".to_string())));
 }
 
-pub fn greet_people(mut commands: Commands,time: Res<Time>, mut timer: ResMut<RGreetTimer>, query: Query<&Cname, With<Cperson>>) {
+pub fn greet_people(mut commands: Commands,time: Res<Time>, mut timer: ResMut<RGreetTimer>, query: Query<&Cname, With<Cpet>>) {
     if timer.tick(time.delta()){
         commands.trigger(EUpdatepeople {target:Cname("Elaina Proctor".to_string()),parameter:"Elaina Hume".to_string()});
     }
@@ -32,6 +34,6 @@ pub fn greet_people(mut commands: Commands,time: Res<Time>, mut timer: ResMut<RG
 
 pub fn apply_setting(mut commands: Commands,sets:ResMut<Setting>) {
     commands.trigger(ESetting{target:sets.clone()});
-    debug!("{:?}",sets)
+    debug_once!("{:#?}",sets)
 
 }

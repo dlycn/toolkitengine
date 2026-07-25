@@ -6,6 +6,7 @@
 
 pub mod res_hello;
 pub mod res_sync;
+pub mod res_ui;
 
 mod res_setting;
 
