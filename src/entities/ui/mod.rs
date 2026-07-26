@@ -1,1 +1,1 @@
-mod fright;
+pub mod fright;

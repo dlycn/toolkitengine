@@ -1,6 +1,6 @@
 use reqwest::Client;
 use rusqlite::ToSql;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet, hash_set};
 
 use crate::dbmg::Dbmbuilder;
 use crate::dbmg::tfm::Table;
@@ -290,7 +290,8 @@ pub fn url_init() -> Bugurl {
         .get_mut("seer.api")
         .unwrap()
         .add_path("/api.php".to_string())
-        .use_path(1);
+        .add_path("/精灵图鉴".into())
+        .use_path(0);
     bu.res.entry("seer.h5.res".to_string()).insert_entry(UB::new(
         "https://seerh5.61.com/resource/assets/fightResource/pet".to_string(),
     ));
@@ -370,26 +371,50 @@ pub fn api_ags(text: String) -> Vec<Vec<String>> {
 
 use scraper::Selector as Selector;
 
-pub fn res_ags(text: String, selectormap: HashMap<String, String>) -> Vec<Vec<String>> {
+#[derive(Clone)]
+pub struct Selectormap{
+    pub resc:Vec<String>,
+    pub link:String,
+}
+
+impl Selectormap{
+    pub fn new(link:String)->Self{
+        Self { resc: Vec::new(), link}
+    }
+
+    pub fn add(&mut self,resp:String)->&Self {
+        self.resc.push(resp);
+        self
+    }
+}
+
+pub fn res_ags(text: String, selectormap: Vec<Selectormap>) -> Vec<Vec<String>> {
     let l = selectormap.len();
-    let mut o = vec![Vec::new(); l];          // 需要 mut 以便修改
+    let mut o = vec![Vec::new(); l];
     let d = scraper::Selector::parse("root > *").unwrap();
     let doc = scraper::Html::parse_document(&text);
 
-    for (n, (k, v)) in selectormap.iter().enumerate() {
+    for (n, map) in selectormap.iter().enumerate() {
+        let setv = Selector::parse(map.link.as_str()).unwrap_or_else(|_| d.clone());
+        let resc = match map.resc.len() {
+            0=>vec!["body".into()],
+            _=>map.resc.clone(),
+        };
+        let mut out = HashSet::new();
+        for k in resc{
         let setk = Selector::parse(k.as_str()).unwrap_or_else(|_| d.clone());
-        let setv = Selector::parse(v.as_str()).unwrap_or_else(|_| d.clone());
-
         if setk != d && setv != d {
             // 1. 先按键选择器定位元素
             for element in doc.select(&setk) {
                 // 2. 在定位到的元素内部，按值选择器提取内容
                 for child in element.select(&setv) {
                     let extracted = child.html();
-                    o[n].push(extracted);
+                    out.insert(extracted);
                 }
             }
         }
+        }
+        o[n] = out.into_iter().collect();
     }
     o
 }

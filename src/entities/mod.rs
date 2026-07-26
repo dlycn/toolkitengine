@@ -1,2 +1,2 @@
-mod pet;
-mod ui;
+pub mod pet;
+pub mod ui;
