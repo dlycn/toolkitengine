@@ -1,10 +1,7 @@
 use bevy::prelude::*;
 
-#[derive(Component)]
-pub struct Cpet;
+#[derive(Component,Default,Clone)]
+pub struct Cpet{pub name:String}
 
-#[derive(Component)]
-pub struct Cname(pub String);
-
-#[derive(Component)]
+#[derive(Component,Default,Clone, Copy)]
 pub struct Cselect;

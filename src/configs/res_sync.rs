@@ -3,6 +3,7 @@ use bevy::prelude::*;
 pub struct RControl {
     pub speed: f32,
     pub scale: f32,
+    pub rate: f32,
     pub lodsprite: f32,
     pub maxfactor: f32,
     pub minfactor: f32,
@@ -12,9 +13,10 @@ impl Default for RControl {
         RControl {
             speed: 50.0,
             scale: 2.0,
+            rate: -0.5,
             lodsprite: 2.0,
-            maxfactor: 8.0,
-            minfactor: 0.125,
+            maxfactor: 32.0,
+            minfactor: 0.25,
         }
     }
 }

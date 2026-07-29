@@ -26,8 +26,8 @@ impl Default for Setinterface {
     fn default() -> Self {Setinterface {
     ofx: 150,
     ofy: 150,
-    width: 1280,
-    height: 720,}
+    width: 1024,
+    height: 512,}
 }}
 
 #[derive(Debug,Clone)]
@@ -41,6 +41,7 @@ impl Default for Setinfo {
     fn default() -> Self {Setinfo {
     title: "Toolkit Engine".to_string(),
     presentmode: PresentMode::AutoNoVsync,
-    windowmode: WindowMode::BorderlessFullscreen(MonitorSelection::Primary)
+    windowmode: WindowMode::Windowed,
+    //windowmode: WindowMode::BorderlessFullscreen(MonitorSelection::Primary)
 }
 }}

@@ -1,4 +1,5 @@
 use crate::events::ESetLod;
+use bevy::input::mouse::AccumulatedMouseScroll;
 use bevy::math::ops::powf;
 use bevy::prelude::*;
 
@@ -7,25 +8,24 @@ use super::super::configs::res_sync;
 
 pub fn control(
     mut commands: Commands,
-    mut query: Query<(&mut Transform, &mut Projection), (With<Cselect>, With<Camera2d>)>,
-    control: ResMut<res_sync::RControl>,
+    mut cameraquery: Query<(&mut Transform, &mut Projection), (With<Cselect>, With<Camera2d>)>,
+    cameracontrol: ResMut<res_sync::RControl>,
     input: Res<ButtonInput<KeyCode>>,
+    scroll: Res<AccumulatedMouseScroll>,
     time: Res<Time>,
 ) {
     if !input.any_pressed([
         KeyCode::ArrowUp,
         KeyCode::ArrowDown,
         KeyCode::ArrowLeft,
-        KeyCode::ArrowRight,
-        KeyCode::Comma,
-        KeyCode::Period,
-    ]) {
+        KeyCode::ArrowRight
+    ]) && scroll.delta == Vec2::ZERO {
         return;
     }
 
-    let fspeed = control.speed * time.delta_secs();
-    let fscale = control.scale;
-    if let Ok((mut transform, mut projection)) = query.single_mut() {
+    let fspeed = cameracontrol.speed * time.delta_secs();
+    let fscale = cameracontrol.scale;
+    if let Ok((mut transform, mut projection)) = cameraquery.single_mut() {
         if input.pressed(KeyCode::ArrowUp) {
             transform.translation.y += fspeed;
         }
@@ -38,16 +38,15 @@ pub fn control(
         if input.pressed(KeyCode::ArrowRight) {
             transform.translation.x += fspeed;
         }
-
+        
+    let control = cameracontrol;
+    
         if let Projection::Orthographic(projection2d) = &mut *projection {
-            debug!("{},{}", transform.translation, projection2d.scale);
+            debug!("{},{},{}", transform.translation, projection2d.scale,scroll.delta.y);
             let pre = projection2d.scale;
-            if input.pressed(KeyCode::Comma) {
-                projection2d.scale *= powf(fscale, time.delta_secs());
-            }
 
-            if input.pressed(KeyCode::Period) {
-                projection2d.scale *= powf(fscale, -time.delta_secs());
+            if scroll.delta.y!=0. {
+                projection2d.scale *= powf(fscale, control.rate*scroll.delta.y);
             }
             let cur = projection2d.scale;
             match (cur < control.lodsprite, pre > control.lodsprite) {

@@ -1,4 +1,5 @@
 
+use super::entities::ui;
 use super::configs::*;
 use super::events::*;
 use super::scripts::*;
@@ -11,17 +12,17 @@ use bevy::prelude::*;
 use bevy::winit::*;
 use bevy::diagnostic::*;
 
-pub struct HelloPlugin;
+pub struct WorldPlugin;
 pub struct SystemPlugin;
 pub struct InitPlugin;
 pub struct DebugPlugin;
 
-impl Plugin for HelloPlugin {
+impl Plugin for WorldPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(RGreetTimer::default());
-        app.add_observer(e_updatepeople);
-        app.add_systems(Startup, add_people);
-        app.add_systems(Update, greet_people);
+        app.add_observer(e_updatepet)
+        .add_systems(Startup, ui::world::build.spawn())
+        .add_systems(Update, greet_people);
     }
 }
 
@@ -30,7 +31,7 @@ impl Plugin for SystemPlugin {
         app
         .insert_resource(RControl::default())
         .add_observer(e_setlod)
-        .add_systems(Startup, system_ini)
+        .add_systems(Startup, ui::system::build.spawn())
         .add_systems(PostUpdate,kmcontrol::control);
     }
 }

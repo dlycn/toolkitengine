@@ -14,7 +14,7 @@ fn main() {
 
     App::new()
         .add_plugins(InitPlugin)
-        .add_plugins(HelloPlugin)
+        .add_plugins(WorldPlugin)
         .add_plugins(SystemPlugin)
         .add_plugins(DebugPlugin)
         .run();

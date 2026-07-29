@@ -1,10 +1,10 @@
 use reqwest::Client;
 use rusqlite::ToSql;
-use std::collections::{HashMap, HashSet, hash_set};
+use std::collections::{HashMap, HashSet};
 
 use crate::dbmg::Dbmbuilder;
 use crate::dbmg::tfm::Table;
-use crate::nwsc::resdata::{Resfix, Work};
+use crate::nwsc::taskfix::{TaskConst,Taskpie};
 use crate::nwsc::{self, resdata};
 use crate::resp::UrlBuild as UB;
 
@@ -12,6 +12,11 @@ pub use resdata::*;
 use serde::*;
 
 use futures::stream::StreamExt;
+
+pub fn goconst(mode:Taskpie)->TaskConst{
+    TaskConst{init:mode}
+}
+
 
 pub fn meta_init() -> HashMap<String, Vec<String>> {
     let mut h = HashMap::new();
@@ -214,9 +219,6 @@ pub async fn go_dlink_resource(ubres: &UB, iter: Vec<u32>, localpath: String, fo
     tokio::fs::write(f, format!("{:?}", out)).await.unwrap();
 }
 
-pub async fn go_group_resource(ubres: &UB, iter: Vec<u32>, localpath: String, format: &str) {
-    let ubc = ubres.goclient();}
-
 #[derive(Clone)]
 pub struct Nmode {
     name: String,
@@ -291,15 +293,18 @@ pub fn url_init() -> Bugurl {
         .unwrap()
         .add_path("/api.php".to_string())
         .add_path("/精灵图鉴".into())
-        .use_path(0);
+        .use_path(1);
     bu.res.entry("seer.h5.res".to_string()).insert_entry(UB::new(
-        "https://seerh5.61.com/resource/assets/fightResource/pet".to_string(),
+        "https://seerh5.61.com/resource/assets".to_string(),
     ));
     
     bu.res
         .get_mut("seer.h5.res")
         .unwrap()
-        .use_path(0);
+        .add_path("/fightResource/pet".to_string())
+        .add_path("/pet/head".to_string())
+        .use_path(1);
+    
     
     bu.res.entry("seer.flash.res".to_string()).insert_entry(UB::new(
         "https://seer.61.com/resource/fightResource/pet".to_string(),
@@ -308,7 +313,7 @@ pub fn url_init() -> Bugurl {
         .get_mut("seer.flash.res")
         .unwrap()
         .add_path("/swf".to_string())
-        .use_path(1);
+        .use_path(0);
 
     bu
 }

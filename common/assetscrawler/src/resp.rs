@@ -30,13 +30,13 @@ impl UrlBuild{
 
     pub fn use_path(&mut self,num:usize)->&mut Self {
         let n = self.child_path.len();
-        if num == 0{self.backup(num)} else {
+        if num == 0{self.backup()} else {
             if n+1>=num{
                 self.main_path.push_str(self.child_path[num].as_str())}
         self}
     }
-    pub fn backup(&mut self,num:usize)->&mut Self {
-        self.main_path=self.child_path[num].clone();
+    pub fn backup(&mut self)->&mut Self {
+        self.main_path=self.child_path[0].clone();
         self
     }
 

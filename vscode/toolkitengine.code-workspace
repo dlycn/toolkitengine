@@ -5,7 +5,13 @@
 		},
 		{
 			"path": "../assets"
+		},
+		{
+			"path": "../tools"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"trae.tab.enableRename": false,
+		"trae.tab.enableAutoImport": false
+	}
 }
