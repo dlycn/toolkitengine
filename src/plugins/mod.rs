@@ -1,4 +1,6 @@
 
+use crate::events::pets::e_select_pet;
+
 use super::entities::ui;
 use super::configs::*;
 use super::events::*;
@@ -7,6 +9,7 @@ use super::scripts::*;
 use bevy::log::LogPlugin;
 use res_hello::*;
 use res_sync::*;
+use res_ui::*;
 
 use bevy::prelude::*;
 use bevy::winit::*;
@@ -20,9 +23,11 @@ pub struct DebugPlugin;
 impl Plugin for WorldPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(RGreetTimer::default());
+        app.insert_resource(Ruilayer::default());
         app.add_observer(e_updatepet)
+        .add_observer(e_select_pet)        
         .add_systems(Startup, ui::world::build.spawn())
-        .add_systems(Update, greet_people);
+        .add_systems(Update, (pet_behavior,greet_people));
     }
 }
 

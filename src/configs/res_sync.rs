@@ -11,7 +11,7 @@ pub struct RControl {
 impl Default for RControl {
     fn default() -> Self {
         RControl {
-            speed: 50.0,
+            speed: 512.0,
             scale: 2.0,
             rate: -0.5,
             lodsprite: 2.0,

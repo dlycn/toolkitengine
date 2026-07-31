@@ -1,6 +1,6 @@
 use bevy::{color::palettes::css::{GREEN, RED}, prelude::*};
 
-use crate::entities::{test,pet};
+use crate::{entities::{pet, test}};
 
 pub fn init(id:u32) -> impl Scene {
     bsn!{
@@ -24,8 +24,8 @@ pub fn build() -> impl SceneList {
     init(5000)
     test::mesh2d(65536.0,RED),
     test::mesh2d(16384.0,GREEN),
+    pet::new("Renzo Hume",5000),
     pet::new("Elaina Proctor",1),
-    pet::selected("Renzo Hume",5000),
     pet::new("Zayna Nieves",2300),
     ]
 }

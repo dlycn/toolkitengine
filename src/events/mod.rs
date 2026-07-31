@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use crate::components::*; 
 
 pub mod setwindows;
+pub mod pets;
 
 #[derive(Event)]
 pub struct EUpdatePet{

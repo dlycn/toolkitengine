@@ -23,21 +23,8 @@ pub fn control(
         return;
     }
 
-    let fspeed = cameracontrol.speed * time.delta_secs();
     let fscale = cameracontrol.scale;
     if let Ok((mut transform, mut projection)) = cameraquery.single_mut() {
-        if input.pressed(KeyCode::ArrowUp) {
-            transform.translation.y += fspeed;
-        }
-        if input.pressed(KeyCode::ArrowDown) {
-            transform.translation.y -= fspeed;
-        }
-        if input.pressed(KeyCode::ArrowLeft) {
-            transform.translation.x -= fspeed;
-        }
-        if input.pressed(KeyCode::ArrowRight) {
-            transform.translation.x += fspeed;
-        }
         
     let control = cameracontrol;
     
@@ -55,6 +42,22 @@ pub fn control(
                 _ => (),
             }
             projection2d.scale = f32::max(cur, control.minfactor).min(control.maxfactor);
+        
+            let fspeed = control.speed * projection2d.scale * time.delta_secs();
+
+            if input.pressed(KeyCode::ArrowUp) {
+                transform.translation.y += fspeed;
+            }
+            if input.pressed(KeyCode::ArrowDown) {
+                transform.translation.y -= fspeed;
+            }
+            if input.pressed(KeyCode::ArrowLeft) {
+                transform.translation.x -= fspeed;
+            }
+            if input.pressed(KeyCode::ArrowRight) {
+                transform.translation.x += fspeed;
+            }    
+
         }
     }
 }

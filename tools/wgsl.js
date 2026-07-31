@@ -31,13 +31,21 @@ async function main() {
   const pipeline = device.createRenderPipeline({
     label: 'our hardcoded red triangle pipeline',
     layout: 'auto',
-    vertex: {
-      module,
-    },
-    fragment: {
-      module,
-      targets: [{ format: presentationFormat }],
-    },n
+    primitive: {
+    topology: 'line-strip',   // 图元拓扑类型：三角形列表
+    cullMode: 'none',            // 背面剔除模式：不剔除
+    frontFace: 'ccw',           // （可选）正面环绕顺序：逆时针（默认值）
+  },
+  
+  vertex: {
+    module,
+    entryPoint: 'vert',  // 如果使用新的着色器入口点
+  },
+  fragment: {
+    module,
+    entryPoint: 'frag',  // 如果使用新的片元着色器入口点
+    targets: [{ format: presentationFormat }],
+  },
   });
 
   const renderPassDescriptor = {
@@ -61,7 +69,7 @@ async function main() {
     const encoder = device.createCommandEncoder({ label: 'encoder' });
     const pass = encoder.beginRenderPass(renderPassDescriptor);
     pass.setPipeline(pipeline);
-    pass.draw(3);  // call our vertex shader 3 times
+    pass.draw(4);  // call our vertex shader 3 times
     pass.end();
 
     const commandBuffer = encoder.finish();
