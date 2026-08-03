@@ -10,6 +10,7 @@ use bevy::log::LogPlugin;
 use res_hello::*;
 use res_sync::*;
 use res_ui::*;
+use res_pet::*;
 
 use bevy::prelude::*;
 use bevy::winit::*;
@@ -24,10 +25,11 @@ impl Plugin for WorldPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(RGreetTimer::default());
         app.insert_resource(Ruilayer::default());
+        app.insert_resource(SelectedPet::default());
         app.add_observer(e_updatepet)
         .add_observer(e_select_pet)        
         .add_systems(Startup, ui::world::build.spawn())
-        .add_systems(Update, (pet_behavior,greet_people));
+        .add_systems(Update, ((pet_behavior,kmcontrol::petcontrol).chain(),greet_people));
     }
 }
 
@@ -37,7 +39,7 @@ impl Plugin for SystemPlugin {
         .insert_resource(RControl::default())
         .add_observer(e_setlod)
         .add_systems(Startup, ui::system::build.spawn())
-        .add_systems(PostUpdate,kmcontrol::control);
+        .add_systems(PostUpdate,kmcontrol::syscontrol);
     }
 }
 

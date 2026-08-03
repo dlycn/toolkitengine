@@ -1,12 +1,13 @@
-use crate::events::ESetLod;
-use bevy::input::mouse::AccumulatedMouseScroll;
+use crate::events::{ESetLod,pets::ESelectPet};
+use crate::configs::res_pet::*;
+use bevy::input::mouse::{AccumulatedMouseScroll};
 use bevy::math::ops::powf;
 use bevy::prelude::*;
 
 use super::super::components::*;
 use super::super::configs::res_sync;
 
-pub fn control(
+pub fn syscontrol(
     mut commands: Commands,
     mut cameraquery: Query<(&mut Transform, &mut Projection), (With<Cselect>, With<Camera2d>)>,
     cameracontrol: ResMut<res_sync::RControl>,
@@ -29,9 +30,8 @@ pub fn control(
     let control = cameracontrol;
     
         if let Projection::Orthographic(projection2d) = &mut *projection {
-            debug!("{},{},{}", transform.translation, projection2d.scale,scroll.delta.y);
+            debug_once!("{},{},{}", transform.translation, projection2d.scale,scroll.delta.y);
             let pre = projection2d.scale;
-
             if scroll.delta.y!=0. {
                 projection2d.scale *= powf(fscale, control.rate*scroll.delta.y);
             }
@@ -41,7 +41,7 @@ pub fn control(
                 (false, false) => commands.trigger(ESetLod { parameter: 1 }),
                 _ => (),
             }
-            projection2d.scale = f32::max(cur, control.minfactor).min(control.maxfactor);
+            projection2d.scale = f32::clamp(cur, control.minfactor, control.maxfactor);
         
             let fspeed = control.speed * projection2d.scale * time.delta_secs();
 
@@ -59,5 +59,52 @@ pub fn control(
             }    
 
         }
+    }
+}
+
+pub fn petcontrol(
+    mut commands: Commands,
+    mut petquery: Query<(&mut Cbehavior, &mut Transform), With<Cpet>>,
+    input: Res<ButtonInput<KeyCode>>,
+    mouse: Res<ButtonInput<MouseButton>>,
+    mut petselect: ResMut<SelectedPet>,
+    window: Single<&Window>,
+    time: Res<Time>,
+) {
+    if let Some(cursor_position) = window.cursor_position(){
+        debug_once!("{:?}",cursor_position);
+        if mouse.just_pressed(MouseButton::Right) {
+            petselect.0 = None;
+        }
+
+    }
+
+    let keyinput = petselect.0.is_some();
+    if keyinput {
+        if !input.any_pressed([
+        KeyCode::KeyW,
+        KeyCode::KeyS,
+        KeyCode::KeyA,
+        KeyCode::KeyD
+        ]){return;}
+        if let Ok((mut behavior,_)) = petquery.get_mut(petselect.0.unwrap()){
+            let mut dx = 0.0;
+            let mut dy = 0.0;
+            if input.pressed(KeyCode::KeyW) {
+                dy += 1.0;
+            }
+            if input.pressed(KeyCode::KeyS) {
+                dy -= 1.0;
+            }
+            if input.pressed(KeyCode::KeyA) {
+                dx -= 1.0;
+            }
+            if input.pressed(KeyCode::KeyD) {
+                dx += 1.0;
+            }
+            behavior.direction = Vec2::new(dx,dy);
+            debug!("{:?}",behavior.direction);
+        }
+        return;
     }
 }

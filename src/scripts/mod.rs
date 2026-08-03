@@ -19,16 +19,15 @@ pub fn greet_people(mut commands: Commands,time: Res<Time>, mut timer: ResMut<RG
     }
 }
 
-pub fn pet_behavior(mut commands: Commands,mut query: Query<Entity,With<Cpet>>,mut querybehavior:Query<(&mut Cbehavior,&mut Transform)>,time: Res<Time>) {
-    let pets = query.iter_mut().collect::<Vec<_>>();
-    if pets.len() == 0 {return;};
-    for pet in pets {
-        if let Ok((mut behavior,mut transform)) = querybehavior.get_mut(pet){
-            let dp:f32 = behavior.speed as f32*time.delta().as_secs_f32();
-            transform.translation += behavior.direction.normalize_or_zero().extend(0.0);
-            transform.translation.x += dp;
-            transform.translation.y += dp;
-        }
+pub fn pet_behavior(mut commands: Commands,mut querybehavior:Query<(&mut Cbehavior,&mut Transform),With<Cpet>>,time: Res<Time>) {
+    if querybehavior.is_empty() {return;};
+    for pet in  querybehavior {
+        let (mut behavior,mut transform) = pet;
+        if behavior.direction == Vec2::ZERO { behavior.speed = 0; continue;}
+        let dp:f32 = behavior.speed as f32*time.delta().as_secs_f32();
+        transform.translation += behavior.direction.normalize_or_zero().extend(0.0);
+        transform.translation.x += dp;
+        transform.translation.y += dp;
     }
     
 }
