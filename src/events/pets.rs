@@ -10,11 +10,6 @@ pub struct ESelectPet{
 pub fn e_select_pet(
     event: On<ESelectPet>,
     mut respet: ResMut<SelectedPet>,
-    mut commands: Commands,
 ) {
-    if respet.0.is_some() {
-        let entity = respet.0.unwrap();
-        commands.entity(entity).remove::<Cselect>();
-    }
     respet.0 = Some(event.entity);
 }

@@ -1,7 +1,7 @@
 use crate::events::{ESetLod,pets::ESelectPet};
 use crate::configs::res_pet::*;
 use bevy::input::mouse::{AccumulatedMouseScroll};
-use bevy::math::ops::powf;
+use bevy::math::ops;
 use bevy::prelude::*;
 
 use super::super::components::*;
@@ -33,7 +33,7 @@ pub fn syscontrol(
             debug_once!("{},{},{}", transform.translation, projection2d.scale,scroll.delta.y);
             let pre = projection2d.scale;
             if scroll.delta.y!=0. {
-                projection2d.scale *= powf(fscale, control.rate*scroll.delta.y);
+                projection2d.scale *= ops::powf(fscale, control.rate*scroll.delta.y);
             }
             let cur = projection2d.scale;
             match (cur < control.lodsprite, pre > control.lodsprite) {
@@ -65,6 +65,7 @@ pub fn syscontrol(
 pub fn petcontrol(
     mut commands: Commands,
     mut petquery: Query<(&mut Cbehavior, &mut Transform), With<Cpet>>,
+    camera_query: Single<(&Camera, &GlobalTransform),With<Cselect>>,
     input: Res<ButtonInput<KeyCode>>,
     mouse: Res<ButtonInput<MouseButton>>,
     mut petselect: ResMut<SelectedPet>,
@@ -72,9 +73,14 @@ pub fn petcontrol(
     time: Res<Time>,
 ) {
     if let Some(cursor_position) = window.cursor_position(){
-        debug_once!("{:?}",cursor_position);
+        let (camera, global_transform) = *camera_query;
+        let worldpos = camera.viewport_to_world_2d(global_transform,cursor_position).expect("error: pos changed from viewport to the world");
+        
         if mouse.just_pressed(MouseButton::Right) {
             petselect.0 = None;
+        }
+        if mouse.just_pressed(MouseButton::Left) {
+            debug_once!("{:?}<->{:?}",cursor_position,worldpos);
         }
 
     }

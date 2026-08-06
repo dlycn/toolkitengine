@@ -38,6 +38,8 @@ ffmpeg -i input.tga output.png
 ffmpeg -i input.png output.tga
 # 批量转换当前目录所有 TGA 为 PNG
 for f in *.tga; do ffmpeg -i "$f" "${f%.tga}.png"; done
+
+texconv -ft DDS .\src\*.bmp -o .\output\
 # ================================ 关键参数解释 ================================
 # basisu -unpack        : 解包模式
 # basisu -no_ktx        : 不生成 .ktx 容器文件
