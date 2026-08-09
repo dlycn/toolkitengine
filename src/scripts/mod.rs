@@ -8,6 +8,25 @@ use crate::events::setwindows::*;
 
 pub mod kmcontrol;
 
+pub fn animate_sprite(
+    time: Res<Time>,
+    mut query: Query<(&AnimationIndices, &mut AnimationTimer, &mut Sprite)>,
+) {
+    for (indices, mut timer, mut sprite) in &mut query {
+        timer.tick(time.delta());
+
+        if timer.just_finished()
+            && let Some(atlas) = &mut sprite.texture_atlas
+        {
+            atlas.index = if atlas.index == indices.last {
+                indices.first
+            } else {
+                atlas.index + 1
+            };
+        }
+    }
+}
+
 pub fn greet_people(mut commands: Commands,time: Res<Time>, mut timer: ResMut<RGreetTimer>, query: Query<&Cpet>) {
     if timer.tick(time.delta()){
         commands.trigger(EUpdatePet {target:"Elaina Proctor".to_string(),parameter:"Elaina Hume".to_string()});

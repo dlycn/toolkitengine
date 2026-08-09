@@ -99,7 +99,7 @@ workspace = true
 
 [dependencies.bevy]
 version = "0.19.0"
-features = [ "default", "ktx2", "dds" ]
+features = [ "default", "ktx2", "zlib" ]
 
 
 [dependencies.clap]

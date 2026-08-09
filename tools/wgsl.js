@@ -1,5 +1,5 @@
 const testwgsl = 'test.wgsl';
-const path = `assets/libs/${testwgsl}`;
+const path = `../src/scripts/libs/${testwgsl}`;
 
 
 
@@ -32,7 +32,7 @@ async function main() {
     label: 'our hardcoded red triangle pipeline',
     layout: 'auto',
     primitive: {
-    topology: 'line-strip',   // 图元拓扑类型：三角形列表
+    topology: 'triangle-list',   // 图元拓扑类型：三角形列表
     cullMode: 'none',            // 背面剔除模式：不剔除
     frontFace: 'ccw',           // （可选）正面环绕顺序：逆时针（默认值）
   },
@@ -69,7 +69,7 @@ async function main() {
     const encoder = device.createCommandEncoder({ label: 'encoder' });
     const pass = encoder.beginRenderPass(renderPassDescriptor);
     pass.setPipeline(pipeline);
-    pass.draw(4);  // call our vertex shader 3 times
+    pass.draw(6);  // call our vertex shader 3 times
     pass.end();
 
     const commandBuffer = encoder.finish();

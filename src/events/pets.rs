@@ -12,4 +12,5 @@ pub fn e_select_pet(
     mut respet: ResMut<SelectedPet>,
 ) {
     respet.0 = Some(event.entity);
+    debug!("{:?}",respet.0);
 }

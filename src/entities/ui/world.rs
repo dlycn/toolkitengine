@@ -12,7 +12,7 @@ pub fn init(id:u32) -> impl Scene {
         display:Display::Flex,
         left: Val::Percent(0.),
         top: Val::Percent(0.),
-        height: Val::Px(64.),
+        height: Val::Px(128.),
         overflow: Overflow::scroll(),
         aspect_ratio: {Some(1.0)},
     }
@@ -24,8 +24,7 @@ pub fn build() -> impl SceneList {
     init(5000)
     test::mesh2d(65536.0,RED),
     test::mesh2d(16384.0,GREEN),
-    pet::new("Renzo Hume",5000),
-    pet::new("Elaina Proctor",1),
-    pet::new("Zayna Nieves",2300),
+    //pet::new("Elaina Proctor",4100),
     ]
 }
+

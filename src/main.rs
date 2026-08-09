@@ -4,9 +4,8 @@ mod scripts;
 mod entities;
 mod components;
 mod events;
-
-
 use bevy::prelude::*;
+use bevy_basisu_loader::BasisuLoaderPlugin;
 use plugins::*;
 
 
@@ -17,6 +16,7 @@ fn main() {
         .add_plugins(WorldPlugin)
         .add_plugins(SystemPlugin)
         .add_plugins(DebugPlugin)
+        .add_plugins(BasisuLoaderPlugin)
         .run();
 
 }

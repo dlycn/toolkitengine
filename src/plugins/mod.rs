@@ -1,7 +1,7 @@
 
 use crate::events::pets::e_select_pet;
 
-use super::entities::ui;
+use super::entities::{ui,pet};
 use super::configs::*;
 use super::events::*;
 use super::scripts::*;
@@ -28,8 +28,9 @@ impl Plugin for WorldPlugin {
         app.insert_resource(SelectedPet::default());
         app.add_observer(e_updatepet)
         .add_observer(e_select_pet)        
-        .add_systems(Startup, ui::world::build.spawn())
-        .add_systems(Update, ((pet_behavior,kmcontrol::petcontrol).chain(),greet_people));
+        .add_systems(Startup, (ui::world::build.spawn(),pet::setup))
+        .add_systems(Update, (pet_behavior,greet_people,animate_sprite.before(pet_behavior)))
+        .add_systems(PostUpdate, kmcontrol::petcontrol);
     }
 }
 
