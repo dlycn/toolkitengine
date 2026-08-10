@@ -2,9 +2,9 @@ use bevy::prelude::*;
 use super::configs::*;
 use super::components::*;
 use super::events::*;
-use crate::configs::res_hello::*;
+use crate::configs::res;
 use crate::events::setwindows::*;
-
+use res::{hello::*};
 
 pub mod kmcontrol;
 
@@ -38,15 +38,16 @@ pub fn greet_people(mut commands: Commands,time: Res<Time>, mut timer: ResMut<RG
     }
 }
 
-pub fn pet_behavior(mut commands: Commands,mut querybehavior:Query<(&mut Cbehavior,&mut Transform),With<Cpet>>,time: Res<Time>) {
+pub fn pet_behavior(mut commands: Commands,querybehavior:Query<(&mut Cbehavior,&mut Transform),With<Cpet>>,time: Res<Time>) {
     if querybehavior.is_empty() {return;};
     for pet in  querybehavior {
         let (mut behavior,mut transform) = pet;
         if behavior.direction == Vec2::ZERO { behavior.speed = 0; continue;}
         let dp:f32 = behavior.speed as f32*time.delta().as_secs_f32();
-        transform.translation += behavior.direction.normalize_or_zero().extend(0.0);
-        transform.translation.x += dp;
-        transform.translation.y += dp;
+        let dir = behavior.direction.normalize_or_zero();
+        transform.scale.x = dir.x.signum();
+        transform.translation.x += dir.x*dp;
+        transform.translation.y += dir.y*dp;
     }
     
 }

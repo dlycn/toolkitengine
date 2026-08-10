@@ -1,7 +1,6 @@
 use bevy::prelude::*;
-use bevy::math::bounding::BoundingCircle;
 use crate::components::*;
-use crate::configs::res_pet::*;
+use crate::configs::res::pet::*;
 
 #[derive(EntityEvent)]
 pub struct ESelectPet{

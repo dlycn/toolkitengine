@@ -10,7 +10,6 @@ use plugins::*;
 
 
 fn main() {
-
     App::new()
         .add_plugins(InitPlugin)
         .add_plugins(WorldPlugin)

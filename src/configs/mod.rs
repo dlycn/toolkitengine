@@ -4,16 +4,24 @@
 //
 //const CONFIG_PATH:&str = r##"src/setting.toml"##;
 
-pub mod res_hello;
-pub mod res_sync;
-pub mod res_ui;
-pub mod res_pet;
-
-
+mod res_global;
+mod res_hello;
+mod res_pet;
 mod res_setting;
+mod res_sync;
+mod res_ui;
+
+pub mod res{
+    pub mod hello{pub use crate::configs::res_hello::*;}
+    pub mod pet{pub use crate::configs::res_pet::*;}
+    pub mod setting{pub use crate::configs::res_setting::*;}
+    pub mod sync{pub use crate::configs::res_sync::*;}
+    pub mod ui{pub use crate::configs::res_ui::*;}
+}
+
 
 use bevy::prelude::*;
-use res_setting::*;
+use res::setting::*;
 
 #[derive(Debug, Clone)]
 pub struct SetInit {

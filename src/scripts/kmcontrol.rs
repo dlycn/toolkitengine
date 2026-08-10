@@ -1,39 +1,42 @@
-use crate::events::{ESetLod,pets::ESelectPet};
-use crate::configs::res_pet::*;
-use bevy::input::mouse::{AccumulatedMouseScroll};
+use crate::configs::res;
+use crate::events::ESetLod;
+use bevy::input::mouse::AccumulatedMouseScroll;
 use bevy::math::ops;
 use bevy::prelude::*;
 
 use super::super::components::*;
-use super::super::configs::res_sync;
 
 pub fn syscontrol(
     mut commands: Commands,
     mut cameraquery: Query<(&mut Transform, &mut Projection), (With<Cselect>, With<Camera2d>)>,
-    cameracontrol: ResMut<res_sync::RControl>,
+    cameracontrol: ResMut<res::sync::RControl>,
     input: Res<ButtonInput<KeyCode>>,
     scroll: Res<AccumulatedMouseScroll>,
     time: Res<Time>,
 ) {
-    if !input.any_pressed([
-        KeyCode::ArrowUp,
-        KeyCode::ArrowDown,
-        KeyCode::ArrowLeft,
-        KeyCode::ArrowRight
-    ]) && scroll.delta == Vec2::ZERO {
-        return;
-    }
-
     let fscale = cameracontrol.scale;
     if let Ok((mut transform, mut projection)) = cameraquery.single_mut() {
-        
-    let control = cameracontrol;
-    
+        if !input.any_pressed([
+            KeyCode::ArrowUp,
+            KeyCode::ArrowDown,
+            KeyCode::ArrowLeft,
+            KeyCode::ArrowRight,
+        ]) && scroll.delta == Vec2::ZERO
+        {
+            return;
+        }
+        let control = cameracontrol;
+
         if let Projection::Orthographic(projection2d) = &mut *projection {
-            debug_once!("{},{},{}", transform.translation, projection2d.scale,scroll.delta.y);
+            debug_once!(
+                "{},{},{}",
+                transform.translation,
+                projection2d.scale,
+                scroll.delta.y
+            );
             let pre = projection2d.scale;
-            if scroll.delta.y!=0. {
-                projection2d.scale *= ops::powf(fscale, control.rate*scroll.delta.y);
+            if scroll.delta.y != 0. {
+                projection2d.scale *= ops::powf(fscale, control.rate * scroll.delta.y);
             }
             let cur = projection2d.scale;
             match (cur < control.lodsprite, pre > control.lodsprite) {
@@ -42,7 +45,7 @@ pub fn syscontrol(
                 _ => (),
             }
             projection2d.scale = f32::clamp(cur, control.minfactor, control.maxfactor);
-        
+
             let fspeed = control.speed * projection2d.scale * time.delta_secs();
 
             if input.pressed(KeyCode::ArrowUp) {
@@ -56,60 +59,66 @@ pub fn syscontrol(
             }
             if input.pressed(KeyCode::ArrowRight) {
                 transform.translation.x += fspeed;
-            }    
-
+            }
         }
     }
 }
 
 pub fn petcontrol(
-    mut commands: Commands,
     mut petquery: Query<(&mut Cbehavior, &mut Transform), With<Cpet>>,
-    camera_query: Single<(&Camera, &GlobalTransform),With<Cselect>>,
+    mut camera_query: Query<
+        (&Camera, &GlobalTransform, &mut Transform),
+        (With<Cselect>, Without<Cpet>),
+    >,
     input: Res<ButtonInput<KeyCode>>,
     mouse: Res<ButtonInput<MouseButton>>,
-    mut petselect: ResMut<SelectedPet>,
-    window: Single<&Window>,
-    time: Res<Time>,
+    mut petselect: ResMut<res::pet::SelectedPet>,
+    window: Single<&Window>
 ) {
-    if let Some(cursor_position) = window.cursor_position(){
-        let (camera, global_transform) = *camera_query;
-        let worldpos = camera.viewport_to_world_2d(global_transform,cursor_position).expect("error: pos changed from viewport to the world");
-        
-        if mouse.just_pressed(MouseButton::Left) {
-            debug_once!("{:?}<->{:?}",cursor_position,worldpos);
-        }
-    }
     let keyinput = petselect.0.is_some();
     let willnum = 3.0;
-    if keyinput {
-        if !input.any_pressed([
-        KeyCode::KeyW,
-        KeyCode::KeyS,
-        KeyCode::KeyA,
-        KeyCode::KeyD
-        ]) && !mouse.just_pressed(MouseButton::Right){return;}
-        if let Ok((mut behavior,_)) = petquery.get_mut(petselect.0.unwrap()){
-            if mouse.just_pressed(MouseButton::Right) {
-                petselect.0 = None;
-                behavior.direction = Vec2::ZERO;
+    if let Ok((camera, global_transform, mut transformca)) = camera_query.single_mut() {
+        if let Some(cursor_position) = window.cursor_position() {
+            let worldpos = camera
+                .viewport_to_world_2d(global_transform, cursor_position)
+                .expect("error: pos changed from viewport to the world");
+
+            if mouse.just_pressed(MouseButton::Left) {
+                debug_once!("{:?}<->{:?}", cursor_position, worldpos);
             }
-            if input.pressed(KeyCode::KeyW) {
-                behavior.direction.y += 1.0;
-            }
-            if input.pressed(KeyCode::KeyS) {
-                behavior.direction.y -= 1.0;
-            }
-            if input.pressed(KeyCode::KeyA) {
-                behavior.direction.x -= 1.0;
-            }
-            if input.pressed(KeyCode::KeyD) {
-                behavior.direction.x += 1.0;
-            }
-            behavior.direction.x = behavior.direction.x.clamp(-willnum, willnum);
-            behavior.direction.y = behavior.direction.y.clamp(-willnum, willnum);
-            debug!("{:?}",behavior.direction);
         }
-        return;
+        if let Ok((mut behavior, transform)) = petquery.get_mut(petselect.0.unwrap()) {
+            transformca.translation = transform.translation;
+            if keyinput {
+                if !input.any_pressed([KeyCode::KeyW, KeyCode::KeyS, KeyCode::KeyA, KeyCode::KeyD])
+                    && !mouse.just_pressed(MouseButton::Right)
+                {
+                    return;
+                }
+                if mouse.just_pressed(MouseButton::Right) {
+                    petselect.0 = None;
+                    behavior.direction = Vec2::ZERO;
+                    behavior.speed = 0;
+                }
+                if input.pressed(KeyCode::KeyW) {
+                    behavior.direction.y += 1.0;
+                }
+                if input.pressed(KeyCode::KeyS) {
+                    behavior.direction.y -= 1.0;
+                }
+                if input.pressed(KeyCode::KeyA) {
+                    behavior.direction.x -= 1.0;
+                }
+                if input.pressed(KeyCode::KeyD) {
+                    behavior.direction.x += 1.0;
+                }
+                behavior.speed = res::pet::PET_MAX_SPEED;
+                behavior.direction.x = behavior.direction.x.clamp(-willnum, willnum);
+                behavior.direction.y = behavior.direction.y.clamp(-willnum, willnum);
+                debug!("{:?},{}", behavior.direction, behavior.speed);
+            }
+
+            return;
+        }
     }
 }

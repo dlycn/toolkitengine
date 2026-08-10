@@ -1,7 +1,11 @@
 use crate::{
-    components::*, configs::{res_pet::PET_MAX_SPEED, res_ui::DEPTH_PET}, events::pets::ESelectPet,
+    components::*, 
+    configs::res,
+    events::pets::ESelectPet,
 };
 use bevy::prelude::*;
+use res::pet::*;
+use res::ui::*;
 pub fn new(name: &str, id: u32) -> impl Scene {
     let path = format!("imgs/Tachies/{}.png", id);
     bsn! {
