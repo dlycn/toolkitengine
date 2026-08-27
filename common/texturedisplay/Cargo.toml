@@ -1,8 +1,24 @@
 [package]
 name = "texturedisplay"
-version.workspace = true
-edition.workspace = true
-license.workspace = true
-authors.workspace = true
 
-[dependencies]
+
+[package.version]
+workspace = true
+
+
+[package.edition]
+workspace = true
+
+
+[package.license]
+workspace = true
+
+
+[package.authors]
+workspace = true
+
+
+[dependencies.image]
+workspace = true
+[dependencies.tokio]
+workspace = true

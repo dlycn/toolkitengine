@@ -1,12 +1,41 @@
+use bevy::platform::time;
 use bevy::prelude::*;
-use super::configs::*;
+use super::configs::{material,res,Setting};
 use super::components::*;
 use super::events::*;
-use crate::configs::res;
 use crate::events::setwindows::*;
-use res::{hello::*};
+use res::{hello,global,sync,layer,pet};
 
 pub mod kmcontrol;
+
+mod hud;
+
+pub mod apply{
+    pub use crate::scripts::hud::font_apply as font;
+    pub mod shaders{
+        pub use crate::scripts::hud::global_shaders_apply as global;
+        pub use crate::scripts::hud::area_shaders_apply as area;
+    }
+}
+
+pub fn res_insert(mut commands: Commands){
+    commands.insert_resource(sync::RControl::default());
+    commands.insert_resource(global::RHandle::default());
+    commands.insert_resource(global::Rbitflag::default());
+    commands.insert_resource(global::RAreaHandle::default());
+}
+
+pub fn res_preload(asset_server: Res<AssetServer>,
+    mut initres: ResMut<global::RHandle>,
+    mut initareas_material: ResMut<Assets<material::AreaMaterial>>,
+    mut ruilayer: ResMut<layer::Ruilayer>,
+) {
+    initres.font = Some(asset_server.load("fonts/source han sans.otf"));
+    let area_material =material::AreaMaterial { color: LinearRgba::GREEN };
+    let area_iter = (0..ruilayer.map_areas.pow(2) as i32).map(|i| IVec2::new(i%ruilayer.map_areas as i32,i/ruilayer.map_areas as i32));
+    initareas_material.add(area_material);
+    ruilayer.map_prepos=Vec::from_iter(area_iter);
+}
 
 pub fn animate_sprite(
     time: Res<Time>,
@@ -27,7 +56,7 @@ pub fn animate_sprite(
     }
 }
 
-pub fn greet_people(mut commands: Commands,time: Res<Time>, mut timer: ResMut<RGreetTimer>, query: Query<&Cpet>) {
+pub fn greet_people(mut commands: Commands,time: Res<Time>, mut timer: ResMut<hello::RGreetTimer>, query: Query<&Cpet>) {
     if timer.tick(time.delta()){
         commands.trigger(EUpdatePet {target:"Elaina Proctor".to_string(),parameter:"Elaina Hume".to_string()});
     }
@@ -38,7 +67,7 @@ pub fn greet_people(mut commands: Commands,time: Res<Time>, mut timer: ResMut<RG
     }
 }
 
-pub fn pet_behavior(mut commands: Commands,querybehavior:Query<(&mut Cbehavior,&mut Transform),With<Cpet>>,time: Res<Time>) {
+pub fn pet_behavior(querybehavior:Query<(&mut Cbehavior,&mut Transform),With<Cpet>>,time: Res<Time>) {
     if querybehavior.is_empty() {return;};
     for pet in  querybehavior {
         let (mut behavior,mut transform) = pet;
@@ -51,7 +80,6 @@ pub fn pet_behavior(mut commands: Commands,querybehavior:Query<(&mut Cbehavior,&
     }
     
 }
-
 pub fn apply_setting(mut commands: Commands,sets:ResMut<Setting>) {
     commands.trigger(ESetting{target:sets.clone()});
     debug!("{:#?}",sets)

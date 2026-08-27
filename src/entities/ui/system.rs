@@ -3,7 +3,9 @@ use crate::components::Cselect;
 pub fn init() -> impl Scene {
     bsn!{
         Camera2d
-        Camera
+        Camera{
+            clear_color: ClearColorConfig::Custom(Color::NONE),
+        }
         Transform
         Cselect
     }

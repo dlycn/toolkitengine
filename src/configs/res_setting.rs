@@ -45,3 +45,14 @@ impl Default for Setinfo {
     //windowmode: WindowMode::BorderlessFullscreen(MonitorSelection::Primary)
 }
 }}
+
+#[derive(Debug,Clone)]
+pub struct Setmode{
+    pub desktoptoys: bool,
+}
+
+impl Default for Setmode {
+    fn default() -> Self {Setmode {
+    desktoptoys:false,
+}
+}}

@@ -1,21 +1,9 @@
-mod configs;
-mod plugins;
-mod scripts;
-mod entities;
-mod components;
-mod events;
-use bevy::prelude::*;
-use bevy_basisu_loader::BasisuLoaderPlugin;
-use plugins::*;
-
+use toolkitengine::Launcher;
+use toolkitengine::studio;
 
 fn main() {
-    App::new()
-        .add_plugins(InitPlugin)
-        .add_plugins(WorldPlugin)
-        .add_plugins(SystemPlugin)
-        .add_plugins(DebugPlugin)
-        .add_plugins(BasisuLoaderPlugin)
+    Launcher::on(studio::CorePlugin)
+        .add_plugins(studio::DebugPlugin)
         .run();
 
 }

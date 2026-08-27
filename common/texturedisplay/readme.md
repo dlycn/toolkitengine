@@ -1,6 +1,11 @@
 
 ## code
 ```bash
+cargo clean
+cargo cache -a
+```
+
+```bash
 # ======================== Basis Universal (basisu) ========================
 # 压缩：PNG/TGA/JPG/QOI → KTX2（默认 ETC1S 模式）
 basisu input.png -output_file output.ktx2

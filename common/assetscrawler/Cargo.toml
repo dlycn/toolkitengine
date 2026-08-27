@@ -3,17 +3,47 @@ name = "assetscrawler"
 version = "0.1.0"
 edition = "2024"
 
+
 [dependencies]
-anyhow = { workspace = true }
-image = { workspace = true }
-reqwest = { version = "0.13.4",features = ["json","stream"] }
-rusqlite = { version = "0.40.1",features = ["bundled"] }
 scraper = "0.27.0"
-tokio = { version = "1.52.3", features = ["full"] }
-serde = { workspace = true }
-serde_json = { workspace = true }
-toml = { workspace = true }
-csv = { workspace = true }
 ndarray = "0.17.2"
 polars = "0.54.4"
 futures = "0.3.32"
+
+
+[dependencies.anyhow]
+workspace = true
+
+
+[dependencies.image]
+workspace = true
+
+
+[dependencies.reqwest]
+version = "0.13.4"
+features = [ "json", "stream" ]
+
+
+[dependencies.rusqlite]
+version = "0.40.1"
+features = [ "bundled" ]
+
+
+[dependencies.tokio]
+workspace = true
+
+
+[dependencies.serde]
+workspace = true
+
+
+[dependencies.serde_json]
+workspace = true
+
+
+[dependencies.toml]
+workspace = true
+
+
+[dependencies.csv]
+workspace = true

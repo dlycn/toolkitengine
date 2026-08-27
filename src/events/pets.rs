@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use crate::components::*;
 use crate::configs::res::pet::*;
 
 #[derive(EntityEvent)]
