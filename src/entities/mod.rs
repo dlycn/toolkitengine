@@ -2,6 +2,7 @@ mod pet; // 私有引入
 mod test;
 mod ui;
 mod map;
+mod global;
 pub mod e2s {
     pub mod pet {
         pub use crate::entities::pet::*;

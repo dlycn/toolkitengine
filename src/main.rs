@@ -3,7 +3,7 @@ use toolkitengine::studio;
 
 fn main() {
     Launcher::on(studio::CorePlugin)
-        .add_plugins(studio::DebugPlugin)
+        //.add_plugins(studio::DebugPlugin)
         .run();
 
 }

@@ -16,6 +16,7 @@ pub struct Cpet{pub name:String, pub maxspeed:u32}
 pub struct Cbehavior{
     pub direction:Vec2,
     pub speed:u32,
+    pub gobalpos:IVec2,
 }
 
 #[derive(Component,Default,Clone)]

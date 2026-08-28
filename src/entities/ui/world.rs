@@ -1,6 +1,7 @@
 use super::super::test;
 use crate::components::ui;
 use crate::configs::material;
+use super::super::global;
 
 use bevy::prelude::*;
 
@@ -105,24 +106,6 @@ pub fn map() -> impl Scene {
         asset_value(material::MapMaterial { color: LinearRgba::WHITE }))}
 }
 
-pub fn res() -> impl Scene {
-    bsn!{
-        ui::CUIres
-        #Eres
-        Node{
-            height: Val::Percent(5.),
-            width: Val::Percent(80.),
-            min_height: Val::Px(48.),
-            max_height: Val::Px(192.),
-            position_type: PositionType::Absolute,
-            right: Val::Px(0.),
-            top: Val::Px(0.),
-        }
-        ImageNode{
-            image:format!("imgs/Headers/1.png"),
-            image_mode:NodeImageMode::Stretch,}}
-    }
-
 pub fn info(txt: String) -> impl Scene {
     bsn! {
         ui::CUIinfo
@@ -136,10 +119,8 @@ pub fn info(txt: String) -> impl Scene {
         }
         Children [
         Text::new(txt)
-        TextFont {
-            font_size: FontSize::Px(24.0),
-            style: FontStyle::Italic,}
-        TextColor(Color::BLACK)]
+        global::std_font()
+        ]
     }
 }
 
