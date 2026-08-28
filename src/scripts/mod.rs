@@ -1,10 +1,9 @@
-use bevy::platform::time;
 use bevy::prelude::*;
 use super::configs::{material,res,Setting};
 use super::components::*;
 use super::events::*;
 use crate::events::setwindows::*;
-use res::{hello,global,sync,layer,pet};
+use res::{hello,global,sync,layer};
 
 pub mod kmcontrol;
 
@@ -77,6 +76,12 @@ pub fn pet_behavior(querybehavior:Query<(&mut Cbehavior,&mut Transform),With<Cpe
         transform.scale.x = dir.x.signum();
         transform.translation.x += dir.x*dp;
         transform.translation.y += dir.y*dp;
+        let mut gx = transform.translation.x as i32>>layer::EXP_AREA;
+        let mut gy = transform.translation.y as i32>>layer::EXP_AREA;
+        behavior.gobalpos += IVec2::new(gx,gy);
+        if gx != 0{gx *= 2i32.pow(layer::EXP_AREA);}
+        if gy != 0{gy *= 2i32.pow(layer::EXP_AREA);}
+        transform.translation -= Vec3::new(gx as f32, gy as f32,0.0);
     }
     
 }

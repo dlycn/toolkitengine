@@ -1,4 +1,4 @@
-use bevy::{math::ISizeVec2, prelude::*};
+use bevy::{prelude::*};
 use crate::configs::material;
 // #[derive(Resource)]
 // pub struct Rcursorpos(pub Option<Vec2>);

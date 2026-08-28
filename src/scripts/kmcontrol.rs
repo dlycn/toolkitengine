@@ -28,9 +28,9 @@ pub fn syscontrol(
                 projection2d.scale,
                 scroll.delta.y
             );
-
-            let x = (transform.translation.x/layer.map_sides as f32).round() as i32;
-            let y = (transform.translation.y/layer.map_sides as f32).round() as i32;
+            let map_sides = layer.map_sides as f32 *2.;
+            let x = (transform.translation.x/map_sides as f32).round() as i32;
+            let y = (transform.translation.y/map_sides as f32).round() as i32;
 
             let pre = projection2d.scale;
 
@@ -61,8 +61,8 @@ pub fn syscontrol(
                 let mut event = ESetLod{parameter:layer.lod_level,center:layer.map_center};
                 if c1{event.parameter = (lv.max(0).min(LOD_IDX.len() as i8 -1)) as u8;}
                 if c2{event.center = IVec2::new(x, y);}
+                debug!("lod:{}; cur:{};pre:{},c1:{},c2:{}",event.parameter,cur,pre,c1,c2);
                 commands.trigger(event);
-                debug!("lod:{}; cur:{};pre:{},c1:{},c2:{}",l,cur,pre,c1,c2);
             }
             
             if !input.any_pressed([
@@ -126,7 +126,7 @@ pub fn petcontrol(
                 for children in grow_query.iter() {  
                     let mut iter = info_query.iter_many_mut(children.iter());
                     while let Some(mut info) = iter.fetch_next() {
-                        info.0 = format!("x:{:>5.0}\ny:{:>5.0}", petpos.x, petpos.y);
+                        info.0 = format!("i:{}\nj:{}\nx:{:>5.0}\ny:{:>5.0}", behavior.gobalpos.x, behavior.gobalpos.y, petpos.x, petpos.y);
                     }
                 }
                 if !input.any_pressed([KeyCode::KeyW, KeyCode::KeyS, KeyCode::KeyA, KeyCode::KeyD])

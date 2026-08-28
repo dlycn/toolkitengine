@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-pub const INDEX_MAX:i8 = 6;
+pub const INDEX_MAX:i8 = 7;
 pub const INDEX_MIN:i8 = -1;
 #[derive(Resource)]
 pub struct RControl {
