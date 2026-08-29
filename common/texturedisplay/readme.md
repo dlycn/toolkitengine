@@ -56,3 +56,7 @@ texconv -ft DDS .\src\*.bmp -o .\output\
 # etcpack -c etc1       : 编码为 ETC1
 # ffmpeg -i             : 指定输入文件
 ```
+## cil
+```bash
+basisu -uastc -quality 100 -effort 10 -uastc_level 4 XXX.png
+```

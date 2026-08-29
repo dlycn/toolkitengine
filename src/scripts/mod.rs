@@ -76,8 +76,10 @@ pub fn pet_behavior(querybehavior:Query<(&mut Cbehavior,&mut Transform),With<Cpe
         transform.scale.x = dir.x.signum();
         transform.translation.x += dir.x*dp;
         transform.translation.y += dir.y*dp;
-        let mut gx = transform.translation.x as i32>>layer::EXP_AREA;
-        let mut gy = transform.translation.y as i32>>layer::EXP_AREA;
+        let tx = transform.translation.x as i32 + 2i32.pow(layer::EXP_AREA-1);
+        let ty = transform.translation.y as i32 + 2i32.pow(layer::EXP_AREA-1);
+        let mut gx = tx>>layer::EXP_AREA;
+        let mut gy = ty>>layer::EXP_AREA;
         behavior.gobalpos += IVec2::new(gx,gy);
         if gx != 0{gx *= 2i32.pow(layer::EXP_AREA);}
         if gy != 0{gy *= 2i32.pow(layer::EXP_AREA);}

@@ -13,6 +13,32 @@ impl UiMaterial for HpMaterial {
 }
 
 #[derive(AsBindGroup, Asset, TypePath, Debug, Clone)]
+pub struct ExpMaterial {
+    #[uniform(0)]
+    pub color: LinearRgba,
+}
+
+impl UiMaterial for ExpMaterial {
+    fn fragment_shader() -> ShaderRef {
+        "libs/expbar.wgsl".into()
+    }
+}
+
+#[derive(AsBindGroup, Asset, TypePath, Debug, Clone)]
+pub struct StateMaterial {
+    #[uniform(0)]
+    pub color: LinearRgba,
+}
+
+impl UiMaterial for StateMaterial {
+    fn fragment_shader() -> ShaderRef {
+        "libs/stategroup.wgsl".into()
+    }
+}
+
+
+
+#[derive(AsBindGroup, Asset, TypePath, Debug, Clone)]
 pub struct AreaMaterial {
     #[uniform(0)]
     pub color: LinearRgba,
@@ -34,7 +60,4 @@ impl UiMaterial for MapMaterial {
     fn fragment_shader() -> ShaderRef {
         "libs/minimap.wgsl".into()
     }
-    // fn vertex_shader() -> ShaderRef {
-    //     "libs/minimap.wgsl".into()
-    // }
 }
