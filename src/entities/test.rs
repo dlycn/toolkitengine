@@ -3,6 +3,6 @@ pub fn mesh2d(size:f32,color:Srgba)->impl Scene{
     bsn!{
         Mesh2d(asset_value(Rectangle::new(size, size)))
         MeshMaterial2d::<ColorMaterial>(asset_value(Color::from(color)))
-        Transform::from_translation(Vec3::new(0.0,0.0,-10.0))
+        Transform::from_translation(Vec3::new(0.0,0.0,-20.0))
     }
 }

@@ -28,7 +28,7 @@ pub fn syscontrol(
                 projection2d.scale,
                 scroll.delta.y
             );
-            let map_sides = layer.map_sides as f32 *2.;
+            let map_sides = layer.map_sides as f32;
             let x = (transform.translation.x/map_sides as f32).round() as i32;
             let y = (transform.translation.y/map_sides as f32).round() as i32;
 

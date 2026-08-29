@@ -31,7 +31,7 @@ pub fn stdbundle(
 
 pub fn statebundle(text:String) -> impl Scene {
     bsn!{Text2d::new(text)
-    global::std_font()
+    global::std_font(1.)
     Visibility::Hidden}
 }
 
@@ -50,7 +50,7 @@ pub fn setup(
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    let texture = asset_server.load("imgs/image.basisu.ktx2");
+    let texture = asset_server.load("imgs/3414.basisu.ktx2");
     let size = [16,14];
     let layout = TextureAtlasLayout::from_grid(UVec2::from_array(size.map(|x|x*(256/16))), 8, 4, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);

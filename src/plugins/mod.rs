@@ -92,7 +92,9 @@ impl Plugin for RanderPlugin {
     fn build(&self, app: &mut App) {
         app
         .add_plugins(UiMaterialPlugin::<material::HpMaterial>::default(),)
-        .add_plugins(UiMaterialPlugin::<material::MapMaterial>::default(),);
+        .add_plugins(UiMaterialPlugin::<material::MapMaterial>::default(),)
+        .add_plugins(UiMaterialPlugin::<material::ExpMaterial>::default(),)
+        .add_plugins(UiMaterialPlugin::<material::StateMaterial>::default(),);
         app.add_plugins(Material2dPlugin::<material::AreaMaterial>::default(),);
 
     }

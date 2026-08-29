@@ -11,8 +11,9 @@ pub fn head() -> impl Scene {
     let rown = 6.;//
     let perh = 15.;
     let rowl =[1.,4.];
-    let coll =[20.,25.,20.,35.];
+    let coll =[25.,25.,10.,40.];
     let minh = STDSIZE*2.;
+    let minw = minh*rown;
     let maxh = minh*2.;
     bsn! {
         Node{
@@ -22,8 +23,8 @@ pub fn head() -> impl Scene {
             top: Val::Percent(0.),
             height: Val::Percent(perh),
             min_height: Val::Px(minh),
+            min_width: Val::Px(minw),
             max_height: Val::Px(maxh),
-            justify_self: JustifySelf::Center,
             aspect_ratio: {Some(rown)},
         }
         Children [(
@@ -45,12 +46,22 @@ pub fn head() -> impl Scene {
             Children [(
                 Node{
                     height:Val::Percent(coll[0]),
-                    width:Val::Percent(100.)
+                    width:Val::Percent(100.),
+                    align_items: AlignItems::Center,
                 }
-                ImageNode{
-                    image:format!("imgs/Headers/{}.png",5000),
-                    image_mode:NodeImageMode::Stretch,
-                }
+                Children [(
+                    Node{
+                        height:Val::Percent(100.),
+                        aspect_ratio: {Some(1.)},
+                    }
+                    ImageNode{
+                        image:format!("imgs/attrs/神灵系.png"),
+                        image_mode:NodeImageMode::Stretch,
+                    }
+                ),(
+                    Text({"圣灵谱尼".to_string()})
+                    global::std_font(1.)
+                )]
             ),(
                 ui::CUIhpbar
                 Node{
@@ -64,19 +75,15 @@ pub fn head() -> impl Scene {
                     height:Val::Percent(coll[2]),
                     width:Val::Percent(100.)
                 }
-                ImageNode{
-                    image:format!("imgs/Headers/{}.png",5000),
-                    image_mode:NodeImageMode::Stretch,
-                }
+                MaterialNode<material::ExpMaterial>(
+                    asset_value(material::ExpMaterial { color: LinearRgba::BLUE }))
             ),(
                 Node{
                     height:Val::Percent(coll[3]),
                     width:Val::Percent(100.)
                 }
-                ImageNode{
-                    image:format!("imgs/Headers/{}.png",5000),
-                    image_mode:NodeImageMode::Stretch,
-                }
+                MaterialNode<material::StateMaterial>(
+                    asset_value(material::StateMaterial { color: LinearRgba::RED }))
             )]
         )]
     }
@@ -111,15 +118,13 @@ pub fn info(txt: String) -> impl Scene {
         ui::CUIinfo
         #Einfo
         Node{
-            height: Val::Percent(60.),
-            width: Val::Percent(40.),
             position_type: PositionType::Absolute,
             left: Val::Px(0.),
-            top: Val::Px(0.),
+            bottom: Val::Px(0.),
         }
         Children [
         Text::new(txt)
-        global::std_font()
+        global::std_font(1.)
         ]
     }
 }
