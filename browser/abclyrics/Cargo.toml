@@ -1,0 +1,9 @@
+[package]
+name = "abclyrics"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+tauri = "2.11.5"
