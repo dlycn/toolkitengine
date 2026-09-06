@@ -23,13 +23,13 @@ crate-type = [ "staticlib", "cdylib", "rlib" ]
 
 
 [[bin]]
-name = "abclyrics"
+name = "abclyricsbin"
 path = "src/main.rs"
 
 
 [dependencies.tauri]
 version = "2.11.5"
-features = [ "default", "devtools", "tray-icon" ]
+features = [ "default", "devtools", "tray-icon", "protocol-asset" ]
 
 
 [dependencies.serde]
@@ -49,4 +49,4 @@ workspace = true
 
 
 [build-dependencies]
-tauri-build = "2.2.0"
+tauri-build = { version = "2.2.0", features = [] }
