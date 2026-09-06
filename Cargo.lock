@@ -22,7 +22,12 @@ checksum = "366ffbaa4442f4684d91e2cd7c5ea7c4ed8add41959a31447066e279e432b618"
 name = "abclyrics"
 version = "0.1.1"
 dependencies = [
+ "anyhow",
+ "serde",
+ "serde_json",
  "tauri",
+ "tauri-build",
+ "tokio",
 ]
 
 [[package]]

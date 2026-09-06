@@ -5,3 +5,5 @@
 **/*.txt
 **/*.html
 **/*.mp3
+**/abclyrics/gen
+**/abclyrics/icons
