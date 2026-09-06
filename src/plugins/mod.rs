@@ -1,12 +1,22 @@
 
 use crate::events::pets::e_select_pet;
 
+<<<<<<< HEAD
 use super::entities::e2s;
 use super::configs::{res, SetInit, Setting, material};
+=======
+use super::entities::{ui,pet};
+use super::configs::*;
+>>>>>>> parent of e94b3f5 (pass)
 use super::events::*;
 use super::scripts::*;
 
 use bevy::log::LogPlugin;
+use res_hello::*;
+use res_sync::*;
+use res_ui::*;
+use res_pet::*;
+
 use bevy::prelude::*;
 use bevy::sprite_render::Material2dPlugin;
 use bevy::winit::*;
@@ -17,11 +27,18 @@ pub struct WorldPlugin;
 
 impl Plugin for WorldPlugin {
     fn build(&self, app: &mut App) {
+<<<<<<< HEAD
+=======
+        app.insert_resource(RGreetTimer::default());
+        app.insert_resource(Ruilayer::default());
+        app.insert_resource(SelectedPet::default());
+>>>>>>> parent of e94b3f5 (pass)
         app.add_observer(e_updatepet)
         .insert_resource(res::hello::RGreetTimer::default())
         .insert_resource(res::layer::Ruilayer::default())
         .insert_resource(res::pet::SelectedPet::default())
         .add_observer(e_select_pet)        
+<<<<<<< HEAD
         .add_systems(Startup, (
             e2s::ui::world::build.spawn(),
             e2s::map::setup.before(res_preload),
@@ -30,6 +47,10 @@ impl Plugin for WorldPlugin {
             pet_behavior,
             greet_people,
             animate_sprite.before(pet_behavior)))
+=======
+        .add_systems(Startup, (ui::world::build.spawn(),pet::setup))
+        .add_systems(Update, (pet_behavior,greet_people,animate_sprite.before(pet_behavior)))
+>>>>>>> parent of e94b3f5 (pass)
         .add_systems(PostUpdate, kmcontrol::petcontrol);
     }
 }
@@ -39,11 +60,17 @@ pub struct SystemPlugin;
 impl Plugin for SystemPlugin {
     fn build(&self, app: &mut App) {
         app
+<<<<<<< HEAD
         .add_observer(e_setlod)
         .add_systems(Startup, (
             (res_insert,res_preload,e2s::ui::system::build.spawn()).chain(),
             (apply::font,apply::shaders::global,apply::shaders::area)
         ).chain())
+=======
+        .insert_resource(RControl::default())
+        .add_observer(e_setlod)
+        .add_systems(Startup, ui::system::build.spawn())
+>>>>>>> parent of e94b3f5 (pass)
         .add_systems(PostUpdate,kmcontrol::syscontrol);
     }
 }

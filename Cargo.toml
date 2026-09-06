@@ -1,5 +1,5 @@
 [workspace]
-members = [ ".", "common/assetscrawler", "common/texturedisplay" ]
+members = [ ".", "browser/abclyrics", "common/assetscrawler", "common/texturedisplay" ]
 exclude = [ "tools/*", "test/*" ]
 
 

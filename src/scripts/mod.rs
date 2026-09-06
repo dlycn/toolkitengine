@@ -2,8 +2,14 @@ use bevy::prelude::*;
 use super::configs::{material,res,Setting};
 use super::components::*;
 use super::events::*;
+<<<<<<< HEAD
 use crate::events::setwindows::*;
 use res::{hello,global,sync,layer};
+=======
+use crate::configs::res_hello::*;
+use crate::events::setwindows::*;
+
+>>>>>>> parent of e94b3f5 (pass)
 
 pub mod kmcontrol;
 
@@ -66,12 +72,17 @@ pub fn greet_people(mut commands: Commands,time: Res<Time>, mut timer: ResMut<he
     }
 }
 
+<<<<<<< HEAD
 pub fn pet_behavior(querybehavior:Query<(&mut Cbehavior,&mut Transform),With<Cpet>>,time: Res<Time>) {
+=======
+pub fn pet_behavior(mut commands: Commands,mut querybehavior:Query<(&mut Cbehavior,&mut Transform),With<Cpet>>,time: Res<Time>) {
+>>>>>>> parent of e94b3f5 (pass)
     if querybehavior.is_empty() {return;};
     for pet in  querybehavior {
         let (mut behavior,mut transform) = pet;
         if behavior.direction == Vec2::ZERO { behavior.speed = 0; continue;}
         let dp:f32 = behavior.speed as f32*time.delta().as_secs_f32();
+<<<<<<< HEAD
         let dir = behavior.direction.normalize_or_zero();
         transform.scale.x = dir.x.signum();
         transform.translation.x += dir.x*dp;
@@ -84,6 +95,11 @@ pub fn pet_behavior(querybehavior:Query<(&mut Cbehavior,&mut Transform),With<Cpe
         if gx != 0{gx *= 2i32.pow(layer::EXP_AREA);}
         if gy != 0{gy *= 2i32.pow(layer::EXP_AREA);}
         transform.translation -= Vec3::new(gx as f32, gy as f32,0.0);
+=======
+        transform.translation += behavior.direction.normalize_or_zero().extend(0.0);
+        transform.translation.x += dp;
+        transform.translation.y += dp;
+>>>>>>> parent of e94b3f5 (pass)
     }
     
 }

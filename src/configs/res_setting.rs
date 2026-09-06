@@ -40,7 +40,7 @@ pub struct Setinfo {
 impl Default for Setinfo {
     fn default() -> Self {Setinfo {
     title: "Toolkit Engine".to_string(),
-    presentmode: PresentMode::AutoVsync,
+    presentmode: PresentMode::AutoNoVsync,
     windowmode: WindowMode::Windowed,
     //windowmode: WindowMode::BorderlessFullscreen(MonitorSelection::Primary)
 }

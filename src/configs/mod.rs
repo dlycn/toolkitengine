@@ -4,10 +4,14 @@
 //
 //const CONFIG_PATH:&str = r##"src/setting.toml"##;
 
-mod res_global;
-mod res_hello;
-mod res_pet;
+pub mod res_hello;
+pub mod res_sync;
+pub mod res_ui;
+pub mod res_pet;
+
+
 mod res_setting;
+<<<<<<< HEAD
 mod res_sync;
 mod res_shader;
 mod res_ui;
@@ -22,9 +26,11 @@ pub mod res{
 }
 pub mod material{pub use crate::configs::res_shader::*;}
 
+=======
+>>>>>>> parent of e94b3f5 (pass)
 
 use bevy::prelude::*;
-use res::setting::*;
+use res_setting::*;
 
 #[derive(Debug, Clone)]
 pub struct SetInit {
