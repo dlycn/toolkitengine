@@ -90,7 +90,7 @@ pub fn head() -> impl Scene {
 }
 
 pub fn map() -> impl Scene {
-    let perh = 20.;
+    let perh = 20f32;
     let minh =STDSIZE*3.;
     let maxh = minh*4.;
     bsn! {
