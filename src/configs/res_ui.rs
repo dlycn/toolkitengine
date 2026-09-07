@@ -42,7 +42,7 @@ impl Default for Ruilayer{
     fn default() -> Self {
         Self{
             lod_level:0,
-            map_areas:2,
+            map_areas:5,
             map_sides:STD_MAP*LOD_MAP[0],
             map_center:IVec2::ZERO,
             map_prepos:Vec::new(),

@@ -9,9 +9,9 @@ const STDSIZE:f32 = 32.;
 
 pub fn head() -> impl Scene {
     let rown = 6.;//
-    let perh = 15.;
+    let perh: f32 = 15.;
     let rowl =[1.,4.];
-    let coll =[25.,25.,10.,40.];
+    let coll: [f32; 4] =[25.,25.,10.,40.];
     let minh = STDSIZE*2.;
     let minw = minh*rown;
     let maxh = minh*2.;
