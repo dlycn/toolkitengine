@@ -1,11 +1,11 @@
 use crate::{
     components::*, configs::{res_pet::PET_MAX_SPEED}, events::pets::ESelectPet,
 };
-use bevy::{gltf::gltf_ext::scene, image::TextureAtlasTemplate};
+use bevy::{image::TextureAtlasTemplate};
 use bevy::prelude::*;
 use crate::configs::res;
 use res::layer::*;
-use res::pet::{PET_EXP,STD_DIFF,PET_DIFF};
+use res::pet::{STD_DIFF,PET_DIFF};
 
 
 
@@ -23,7 +23,7 @@ pub fn stdpet(
                 custom_size:Option::Some(size),
             }
             AnimationIndices { first: 0, last: 26 }
-            Transform::from_xyz(pos.x, pos.y, OFS_PET)
+            Transform::from_xyz(pos.x, pos.y, OFS.pet)
             Cpet{name:{"圣灵谱尼".to_string()},maxspeed:PET_MAX_SPEED}
             Cbehavior{direction:Vec2::ZERO,speed:0,gobalpos:IVec2::ZERO}
             AnimationTimer(Timer::from_seconds(5.0/128.0, TimerMode::Repeating))      

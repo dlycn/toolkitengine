@@ -1,9 +1,28 @@
-use bevy::prelude::*;
+use bevy::{prelude::*};
 
-pub const OFS_MAP:f32 = -1.0;
-pub const OFS_PET:f32 = 0.1;
-pub const EXP_BASE:u32 = 7;
-pub const EXP_MAX:u32 = 8;
+const EXP_MAX:u32 = 8;
+const OFS_MAP:f32 = -1.0;
+const OFS_PET:f32 = 0.1;
+
+pub struct UIofs{
+    pub map:f32,
+    pub pet:f32,
+}
+
+
+/// ## offset for z-axis
+/// ### default
+/// - map = **-1.0**
+/// - pet = **0.1**
+pub const OFS:UIofs = UIofs{
+    map:OFS_MAP,
+    pet:OFS_PET,
+};
+
+/// - exponent for tile size
+/// - default: **10**
+pub const EXP_BASE:u32 = 10;
+
 pub const EXP_AREA:u32 = EXP_BASE+EXP_MAX;
 pub const STD_MAP:u32 = 2u32.pow(EXP_BASE);
 pub const LOD_LEVELS:usize = 5;

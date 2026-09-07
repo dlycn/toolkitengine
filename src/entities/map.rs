@@ -7,7 +7,7 @@ fn area(size:f32)->impl Scene{
         ui::CUIarea
         Mesh2d(asset_value(Rectangle::new(size, size)))
         MeshMaterial2d::<AreaMaterial>::default()
-        Transform::from_translation(Vec3::new(0.0, 0.0, layer::OFS_MAP))
+        Transform::from_translation(Vec3::new(0.0, 0.0, layer::OFS.map))
     }
 }
 
