@@ -7,4 +7,11 @@ async function testFetch() {
         console.error('fetch 失败:', e);
     }
 }
+
+function testButton() {
+    console.log('CSP 测试按钮被点击了！');
+}
+
+document.getElementById('test-button').addEventListener('click', testButton);
+
 testFetch();

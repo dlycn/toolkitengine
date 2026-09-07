@@ -12,6 +12,8 @@ fn open_url(url: String) -> Result<(), String> {
     Ok(())
 }
 
+
+
 pub fn run(){
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![open_url])

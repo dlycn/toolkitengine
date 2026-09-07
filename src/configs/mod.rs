@@ -11,7 +11,6 @@ pub mod res_pet;
 
 
 mod res_setting;
-<<<<<<< HEAD
 mod res_sync;
 mod res_shader;
 mod res_ui;
@@ -26,8 +25,6 @@ pub mod res{
 }
 pub mod material{pub use crate::configs::res_shader::*;}
 
-=======
->>>>>>> parent of e94b3f5 (pass)
 
 use bevy::prelude::*;
 use res_setting::*;
