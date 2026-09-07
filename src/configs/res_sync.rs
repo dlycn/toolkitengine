@@ -20,3 +20,16 @@ impl Default for RControl {
         }
     }
 }
+#[derive(Resource)]
+pub struct RGobalLocation {
+    pub pos: Vec3,
+    pub index: IVec2,
+}
+impl Default for RGobalLocation {
+    fn default() -> Self {
+        RGobalLocation {
+            pos: Vec3::ZERO,
+            index: IVec2::ZERO,
+        }
+    }
+}

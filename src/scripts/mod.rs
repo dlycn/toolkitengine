@@ -19,6 +19,7 @@ pub mod apply{
 
 pub fn res_insert(mut commands: Commands){
     commands.insert_resource(sync::RControl::default());
+    commands.insert_resource(sync::RGobalLocation::default());
     commands.insert_resource(global::RHandle::default());
     commands.insert_resource(global::Rbitflag::default());
     commands.insert_resource(global::RAreaHandle::default());
@@ -76,17 +77,29 @@ pub fn pet_behavior(querybehavior:Query<(&mut Cbehavior,&mut Transform),With<Cpe
         transform.scale.x = dir.x.signum();
         transform.translation.x += dir.x*dp;
         transform.translation.y += dir.y*dp;
-        let tx = transform.translation.x as i32 + 2i32.pow(layer::EXP_AREA-1);
-        let ty = transform.translation.y as i32 + 2i32.pow(layer::EXP_AREA-1);
-        let mut gx = tx>>layer::EXP_AREA;
-        let mut gy = ty>>layer::EXP_AREA;
-        behavior.gobalpos += IVec2::new(gx,gy);
-        if gx != 0{gx *= 2i32.pow(layer::EXP_AREA);}
-        if gy != 0{gy *= 2i32.pow(layer::EXP_AREA);}
-        transform.translation -= Vec3::new(gx as f32, gy as f32,0.0);
+
+        let (translation,gobalpos) = get_location(transform.translation,behavior.gobalpos);
+
+        transform.translation = translation;
+        behavior.gobalpos = gobalpos;
+        
     }
     
 }
+
+pub fn get_location(mut translation:Vec3,mut gobalpos:IVec2)->(Vec3,IVec2){
+    let tx = translation.x as i32 + 2i32.pow(layer::EXP_AREA-1);
+    let ty = translation.y as i32 + 2i32.pow(layer::EXP_AREA-1);
+    let mut gx = tx>>layer::EXP_AREA;
+    let mut gy = ty>>layer::EXP_AREA;
+    gobalpos += IVec2::new(gx,gy);
+    if gx != 0{gx *= 2i32.pow(layer::EXP_AREA);}
+    if gy != 0{gy *= 2i32.pow(layer::EXP_AREA);}
+    translation-=Vec3::new(gx as f32, gy as f32,0.0);
+    (translation,gobalpos)
+}
+
+
 pub fn apply_setting(mut commands: Commands,sets:ResMut<Setting>) {
     commands.trigger(ESetting{target:sets.clone()});
     debug!("{:#?}",sets)

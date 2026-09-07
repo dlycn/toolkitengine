@@ -1,4 +1,4 @@
-use bevy::{prelude::*, text::FontSourceTemplate};
+use bevy::{ prelude::*, text::FontSourceTemplate};
 pub fn font(size:f32,color:Color) -> impl Scene {
     bsn! {
     TextFont {
@@ -12,5 +12,5 @@ pub fn font(size:f32,color:Color) -> impl Scene {
 
 pub fn std_font(scale:f32) -> impl Scene {
     let size = scale;
-    font(size,Color::BLACK)
+    font(size,Color::linear_rgb(0.5, 0.5, 0.5))
 }   
