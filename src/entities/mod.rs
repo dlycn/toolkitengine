@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 mod pet; // 私有引入
 mod test;
 mod ui;
@@ -16,8 +15,3 @@ pub mod e2s {
     }
 }
 
-=======
-pub mod pet;
-pub mod ui;
-pub mod test;
->>>>>>> parent of e94b3f5 (pass)

@@ -1,14 +1,8 @@
-<<<<<<< HEAD
 use crate::configs::res::layer::LOD_IDX;
 use crate::configs::res;
 use crate::components::ui;
 use crate::events::ESetLod;
 use bevy::input::mouse::AccumulatedMouseScroll;
-=======
-use crate::events::{ESetLod,pets::ESelectPet};
-use crate::configs::res_pet::*;
-use bevy::input::mouse::{AccumulatedMouseScroll};
->>>>>>> parent of e94b3f5 (pass)
 use bevy::math::ops;
 use bevy::prelude::*;
 
@@ -17,14 +11,9 @@ use super::super::configs::res_sync;
 
 pub fn syscontrol(
     mut commands: Commands,
-<<<<<<< HEAD
     mut cameraquery: Query<(&mut Transform, &mut Projection), With<Camera2d>>,
     layer: Res<res::layer::Ruilayer>,    
     cameracontrol: ResMut<res::sync::RControl>,
-=======
-    mut cameraquery: Query<(&mut Transform, &mut Projection), (With<Cselect>, With<Camera2d>)>,
-    cameracontrol: ResMut<res_sync::RControl>,
->>>>>>> parent of e94b3f5 (pass)
     input: Res<ButtonInput<KeyCode>>,
     scroll: Res<AccumulatedMouseScroll>,
     time: Res<Time>,
@@ -40,7 +29,6 @@ pub fn syscontrol(
 
     let fscale = cameracontrol.scale;
     if let Ok((mut transform, mut projection)) = cameraquery.single_mut() {
-<<<<<<< HEAD
         let control = cameracontrol;
 
         if let Projection::Orthographic(projection2d) = &mut *projection {
@@ -70,16 +58,6 @@ pub fn syscontrol(
 
             l += e as u8;
 
-=======
-        
-    let control = cameracontrol;
-    
-        if let Projection::Orthographic(projection2d) = &mut *projection {
-            debug_once!("{},{},{}", transform.translation, projection2d.scale,scroll.delta.y);
-            let pre = projection2d.scale;
-            if scroll.delta.y!=0. {
-                projection2d.scale *= ops::powf(fscale, control.rate*scroll.delta.y);
->>>>>>> parent of e94b3f5 (pass)
             }
             let mut  cur = projection2d.scale;
             cur = f32::clamp(cur, control.minfactor, control.maxfactor);
@@ -96,7 +74,6 @@ pub fn syscontrol(
                 debug!("lod:{}; cur:{};pre:{},c1:{},c2:{}",event.parameter,cur,pre,c1,c2);
                 commands.trigger(event);
             }
-<<<<<<< HEAD
             
             if !input.any_pressed([
                 KeyCode::ArrowUp,
@@ -109,10 +86,6 @@ pub fn syscontrol(
             }
             projection2d.scale = cur;
 
-=======
-            projection2d.scale = f32::clamp(cur, control.minfactor, control.maxfactor);
-        
->>>>>>> parent of e94b3f5 (pass)
             let fspeed = control.speed * projection2d.scale * time.delta_secs();
 
             if input.pressed(KeyCode::ArrowUp) {
@@ -135,7 +108,6 @@ pub fn syscontrol(
 pub fn petcontrol(
     mut commands: Commands,
     mut petquery: Query<(&mut Cbehavior, &mut Transform), With<Cpet>>,
-<<<<<<< HEAD
     mut camera_query: Query<
         (&Camera, &GlobalTransform, &mut Transform),
         (With<Cselect>, Without<Cpet>),
@@ -200,53 +172,4 @@ pub fn petcontrol(
             return;
         }
     }
-=======
-    camera_query: Single<(&Camera, &GlobalTransform),With<Cselect>>,
-    input: Res<ButtonInput<KeyCode>>,
-    mouse: Res<ButtonInput<MouseButton>>,
-    mut petselect: ResMut<SelectedPet>,
-    window: Single<&Window>,
-    time: Res<Time>,
-) {
-    if let Some(cursor_position) = window.cursor_position(){
-        let (camera, global_transform) = *camera_query;
-        let worldpos = camera.viewport_to_world_2d(global_transform,cursor_position).expect("error: pos changed from viewport to the world");
-        
-        if mouse.just_pressed(MouseButton::Left) {
-            debug_once!("{:?}<->{:?}",cursor_position,worldpos);
-        }
-    }
-    let keyinput = petselect.0.is_some();
-    let willnum = 3.0;
-    if keyinput {
-        if !input.any_pressed([
-        KeyCode::KeyW,
-        KeyCode::KeyS,
-        KeyCode::KeyA,
-        KeyCode::KeyD
-        ]) && !mouse.just_pressed(MouseButton::Right){return;}
-        if let Ok((mut behavior,_)) = petquery.get_mut(petselect.0.unwrap()){
-            if mouse.just_pressed(MouseButton::Right) {
-                petselect.0 = None;
-                behavior.direction = Vec2::ZERO;
-            }
-            if input.pressed(KeyCode::KeyW) {
-                behavior.direction.y += 1.0;
-            }
-            if input.pressed(KeyCode::KeyS) {
-                behavior.direction.y -= 1.0;
-            }
-            if input.pressed(KeyCode::KeyA) {
-                behavior.direction.x -= 1.0;
-            }
-            if input.pressed(KeyCode::KeyD) {
-                behavior.direction.x += 1.0;
-            }
-            behavior.direction.x = behavior.direction.x.clamp(-willnum, willnum);
-            behavior.direction.y = behavior.direction.y.clamp(-willnum, willnum);
-            debug!("{:?}",behavior.direction);
-        }
-        return;
-    }
->>>>>>> parent of e94b3f5 (pass)
 }
