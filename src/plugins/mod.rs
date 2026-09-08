@@ -1,5 +1,5 @@
 
-use crate::events::pets::e_select_pet;
+use crate::events::pets::*;
 
 use super::entities::e2s;
 use super::configs::{res, SetInit, Setting, material};
@@ -22,11 +22,15 @@ impl Plugin for WorldPlugin {
         .insert_resource(res::hello::RGreetTimer::default())
         .insert_resource(res::layer::Ruilayer::default())
         .insert_resource(res::pet::SelectedPet::default())
-        .add_observer(e_select_pet)        
+        .insert_resource(res::pet::CreatedPet::default())
+        .add_observer(e_select_pet)    
+        .add_observer(e_create_pet)    
         .add_systems(Startup, (
             e2s::ui::world::build.spawn(),
             e2s::map::setup.before(res_preload),
-            e2s::pet::setup.after(res_preload)))
+            e2s::pet::setup.after(res_preload),
+            ))
+        .add_systems(Startup, e2s::pet::pet_select.after(e2s::pet::setup))
         .add_systems(Update, (
             pet_behavior,
             greet_people,
@@ -45,6 +49,7 @@ impl Plugin for SystemPlugin {
             (res_insert,res_preload,e2s::ui::system::build.spawn()).chain(),
             (apply::font,apply::shaders::global,apply::shaders::area)
         ).chain())
+        
         .add_systems(PostUpdate,kmcontrol::syscontrol);
     }
 }

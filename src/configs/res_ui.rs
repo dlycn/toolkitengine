@@ -27,7 +27,7 @@ pub const EXP_AREA:u32 = EXP_BASE+EXP_MAX;
 pub const STD_MAP:u32 = 2u32.pow(EXP_BASE);
 pub const LOD_LEVELS:usize = 5;
 pub const LOD_MAP:[u32;LOD_LEVELS] = [1,4,16,64,2u32.pow(EXP_MAX)];
-pub const LOD_IDX:[f32;LOD_LEVELS] = [0.25,1.95,7.85,31.5,127.0];
+pub const LOD_IDX:[f32;LOD_LEVELS] = [0.,1.95,7.85,31.5,127.0];
 
 
 #[derive(Resource)]

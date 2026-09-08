@@ -14,3 +14,6 @@ pub const PET_DIFF: u8 = PET_EXP - AYS_EXP;
 
 #[derive(Resource, Default)]
 pub struct SelectedPet(pub Option<Entity>);
+
+#[derive(Resource, Default)]
+pub struct CreatedPet(pub Option<Entity>);

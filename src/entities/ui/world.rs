@@ -134,6 +134,6 @@ pub fn build() -> impl SceneList {
         head(),
         map(),
         info(format!("x:{: >5.0}\ny:{: >5.0}",0,0)),
-        test::mesh2d(65536.0,Srgba::RED),
+        test::mesh2d(16384.0,Srgba::RED),
     ]
 }

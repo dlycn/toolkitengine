@@ -62,7 +62,7 @@ pub fn greet_people(mut commands: Commands,time: Res<Time>, mut timer: ResMut<he
     }
     if timer.0.just_finished() {
         for pet in &query {
-            println!("hello {}!", pet.name);
+            //println!("hello {}!", pet.name);
         }
     }
 }
@@ -87,6 +87,8 @@ pub fn pet_behavior(querybehavior:Query<(&mut Cbehavior,&mut Transform),With<Cpe
     
 }
 
+
+
 pub fn get_location(mut translation:Vec3,mut gobalpos:IVec2)->(Vec3,IVec2){
     let tx = translation.x as i32 + 2i32.pow(layer::EXP_AREA-1);
     let ty = translation.y as i32 + 2i32.pow(layer::EXP_AREA-1);
@@ -98,6 +100,8 @@ pub fn get_location(mut translation:Vec3,mut gobalpos:IVec2)->(Vec3,IVec2){
     translation-=Vec3::new(gx as f32, gy as f32,0.0);
     (translation,gobalpos)
 }
+
+
 
 
 pub fn apply_setting(mut commands: Commands,sets:ResMut<Setting>) {

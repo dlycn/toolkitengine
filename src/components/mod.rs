@@ -25,5 +25,12 @@ pub struct AnimationIndices {
     pub last: usize,
 }
 
+#[derive(Component,Default,Clone)]
+pub struct PetConfig {
+    pub texture_size:[u32;2],
+    pub pet_name:String,
+    pub pet_indice:usize
+}
+
 #[derive(Component, Deref, DerefMut,Clone,Default)]
 pub struct AnimationTimer(pub Timer);
