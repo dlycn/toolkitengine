@@ -66,6 +66,7 @@ pub fn setup(
     mut commands: Commands,
 ) {
     let mut idnum: Vec<([usize; 2], fn(usize) -> Vec2)> = Vec::new();
+    
     idnum.push(([5000, 100000], |i| Vec2::new(i as f32, 0.0)));
     idnum.push(([3414, 100000], |i| Vec2::new(i as f32, 0.0)));
 
