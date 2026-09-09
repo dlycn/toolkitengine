@@ -69,7 +69,7 @@ pub fn head() -> impl Scene {
                     width:Val::Percent(100.)
                 }
                 MaterialNode<material::HpMaterial>(
-                    asset_value(material::HpMaterial { color: LinearRgba::WHITE }))
+                    asset_value(material::HpMaterial { color: LinearRgba::GREEN }))
             ),(
                 Node{
                     height:Val::Percent(coll[2]),
