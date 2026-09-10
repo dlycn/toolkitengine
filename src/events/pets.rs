@@ -59,7 +59,6 @@ pub fn e_create_pet(
 
         let texture_atlas_layout = texture_atlas_layouts.add(layout);
 
-        // 在 for (param, func) in event.idnum.iter() 循环内部：
         let mut pets: Vec<_> = (0..num)
             .map(|i| {
                 e2s::pet::stdpet(

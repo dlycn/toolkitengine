@@ -10,7 +10,7 @@ struct AttributeManager {
     pub attribute_max: u32,
     pub attribute_ini: Vec<Attribute>,
     pub attribute_task: Vec<(AttributeType, Vec<String>)>,
-    pub attribute_judge: Vec<(AttributeJudge,u8,Vec<u8>)>,
+    pub attribute_judge: Vec<(AttributeJudge,u32,Vec<u32>)>,
 }
 
 /// * Attribute Standard
@@ -63,8 +63,8 @@ impl AttributeBuilder {
     }
     pub fn judge(
         &mut self,
-        attribute_index: u8,
-        attribute_names: Vec<u8>,
+        attribute_index: u32,
+        attribute_names: Vec<u32>,
     ) -> &mut Self {
         self.attribute_root
             .attribute_judge
@@ -74,11 +74,6 @@ impl AttributeBuilder {
     pub fn backup(&self) -> AttributeManager {
         let opt = self.clone();
         opt.attribute_root
-    }
-
-    pub fn run(&self) -> result::Result<String, String> {
-        self.backup()
-        .run()
     }
 }
 
@@ -106,8 +101,6 @@ impl AttributeManager {
                 data
             },
             AttributeType::Element => |mut data, index, num| {
-                if num == 1 { data[index + 0][index + 0] = EFF_HALF;} 
-                else {
                 for i in 0..num {
                     for j in 0..num {
                         let v = if i == j {
@@ -119,35 +112,12 @@ impl AttributeManager {
                         };
                         data[index + i][index + j] = v;
                     }
-                }}
+                }
                 data
             },
             AttributeType::Energy => |mut data, index, num| {
                 for i in 0..num {
                     data[index + i][index + i] = EFF_TWO;
-                }
-                data
-            },
-        }
-    }
-
-    pub fn judgematch(attribute_judge: AttributeJudge) -> fn(Vec<Vec<u8>>, usize, Vec<u8>) -> Vec<Vec<u8>> {
-        match attribute_judge {
-            AttributeJudge::Super => |mut data, main_index, attribute_indexs| {
-                for i in attribute_indexs {
-                    data[main_index][i as usize] = EFF_TWO;
-                }
-                data
-            },
-            AttributeJudge::Resisted => |mut data, main_index, attribute_indexs| {
-                for i in attribute_indexs {
-                    data[main_index][i as usize] = EFF_HALF;
-                }
-                data
-            },
-            AttributeJudge::Immune => |mut data, main_index, attribute_indexs| {
-                for i in attribute_indexs {
-                    data[main_index][i as usize] = EFF_ZERO;
                 }
                 data
             },
@@ -161,7 +131,7 @@ impl AttributeManager {
         let mut index: usize = 0;
         let mut num: usize = 0;
         for (attribute_type, attribute_names) in self.attribute_task {
-            num = attribute_names.len();
+            num += attribute_names.len();
             for attribute_name in attribute_names {
                 self.attribute_ini.push(Attribute {
                     attribute_name,
@@ -171,9 +141,6 @@ impl AttributeManager {
             data = AttributeManager::typematch(attribute_type)(data, index, num);
             index += num;
         }
-        for (attribute_judge, attribute_index, attribute_names) in self.attribute_judge {
-            data = AttributeManager::judgematch(attribute_judge)(data, attribute_index as usize, attribute_names);
-        }
         Ok(format!("{:?}\n{:?}", self.attribute_ini, data))
     }
 }
@@ -181,16 +148,7 @@ impl AttributeManager {
 fn main(){
     let attr = AttributeManager::default();
     let res = attr.set(AttributeType::Element, AttributeJudge::Super)
-        .add(vec!["草","水","火"])
-        .add(vec!["电","光"])
-        .backup()
-        .set(AttributeType::Energy, AttributeJudge::Super)
-        .add(vec!["暗","冰"])
-        .backup()
-        .set(AttributeType::Rule, AttributeJudge::Super)
-        .add(vec!["地","风"])
-        .judge(8, vec![0])
-        .judge(6, vec![0,7,8])
-        .run();
+        .add(vec!["草","水","水"])
+        .backup().run();
     println!("{}", res.unwrap());
 }

@@ -8,6 +8,11 @@ use res::{hello,global,sync,layer};
 pub mod kmcontrol;
 
 mod hud;
+mod params_init;
+
+pub mod params{
+    pub use super::params_init::*;
+}
 
 pub mod apply{
     pub use crate::scripts::hud::font_apply as font;
