@@ -203,14 +203,13 @@ fn main(){
         // === Resisted: 攻击方对目标微弱 ===
         .backup()
         .set(AttributeType::Rule, AttributeJudge::Resisted)
-        .judge(0, vec![8])   // 草→风=0.5
+        .judge(0, vec![5,8])   // 草→暗,风=0.5
         .judge(1, vec![3])   // 水→电=0.5
         .judge(2, vec![7])   // 火→地=0.5
         .judge(3, vec![0])   // 电→草=0.5
-        .judge(5, vec![7,8])   // 暗→地,风=0.5
         .judge(6, vec![2])   // 冰→火=0.5
-        .judge(7, vec![1,6])   // 地→水,冰=0.5
-        .judge(8, vec![4,7])   // 风→光,地=0.5
+        .judge(7, vec![1,5,6])   // 地→水,暗,冰=0.5
+        .judge(8, vec![4,5,7])   // 风→光,暗,地=0.5
         // === Immune: 攻击方对目标无效 ===
         .backup()
         .set(AttributeType::Rule, AttributeJudge::Immune)
