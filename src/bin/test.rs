@@ -112,6 +112,8 @@ impl AttributeManager {
                     for j in 0..num {
                         let v = if i == j {
                             EFF_HALF
+                        } else if num == 2{
+                            EFF_HALF
                         } else if (j + num - i) % num == 1 {
                             EFF_TWO
                         } else {
@@ -179,6 +181,7 @@ impl AttributeManager {
 }
 
 fn main(){
+    // Index: [0]草 [1]水 [2]火 | [3]电 [4]光 | [5]暗 [6]冰 | [7]地 [8]风
     let attr = AttributeManager::default();
     let res = attr.set(AttributeType::Element, AttributeJudge::Super)
         .add(vec!["草","水","火"])
@@ -189,8 +192,31 @@ fn main(){
         .backup()
         .set(AttributeType::Rule, AttributeJudge::Super)
         .add(vec!["地","风"])
-        .judge(8, vec![0])
-        .judge(6, vec![0,7,8])
+        .judge(0, vec![4])   // 草→光=2.0
+        .judge(2, vec![3,6])   // 火→电,冰=2.0
+        .judge(3, vec![1,2])   // 电→水,火=2.0
+        .judge(4, vec![5])   // 光→暗=2.0
+        .judge(5, vec![0])   // 暗→草=2.0
+        .judge(6, vec![7])   // 冰→地=2.0
+        .judge(7, vec![3])   // 地→电=2.0
+        .judge(8, vec![3])   // 风→电=2.0 (恒星风暴携带带电粒子)
+        // === Resisted: 攻击方对目标微弱 ===
+        .backup()
+        .set(AttributeType::Rule, AttributeJudge::Resisted)
+        .judge(0, vec![8])   // 草→风=0.5
+        .judge(1, vec![3])   // 水→电=0.5
+        .judge(2, vec![7])   // 火→地=0.5
+        .judge(3, vec![0])   // 电→草=0.5
+        .judge(5, vec![7,8])   // 暗→地,风=0.5
+        .judge(6, vec![2])   // 冰→火=0.5
+        .judge(7, vec![1,6])   // 地→水,冰=0.5
+        .judge(8, vec![4,7])   // 风→光,地=0.5
+        // === Immune: 攻击方对目标无效 ===
+        .backup()
+        .set(AttributeType::Rule, AttributeJudge::Immune)
+        .judge(3, vec![7])   // 电→地=0
+        .judge(4, vec![0])   // 光→草=0
+        .judge(7, vec![8])   // 地→风=0
         .run();
     println!("{}", res.unwrap());
 }
