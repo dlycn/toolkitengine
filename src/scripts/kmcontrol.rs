@@ -5,6 +5,7 @@ use crate::events::ESetLod;
 use bevy::input::mouse::AccumulatedMouseScroll;
 use bevy::math::ops;
 use bevy::prelude::*;
+use std::fmt::Write;
 
 use super::super::components::*;
 pub fn syscontrol(
@@ -174,13 +175,16 @@ pub fn petcontrol(
             for children in grow_query.iter() {
                 let mut iter = info_query.iter_many_mut(children.iter());
                 while let Some(mut info) = iter.fetch_next() {
-                    info.0 = format!(
+                    info.0.clear();
+                    write!(
+                        info.0,
                         "i:{}\nj:{}\nx:{:>5.0}\ny:{:>5.0}",
                         goballocation.index.x,
                         goballocation.index.y,
                         goballocation.pos.x,
                         goballocation.pos.y
-                    );
+                    )
+                    .unwrap();
                 }
             }
         }

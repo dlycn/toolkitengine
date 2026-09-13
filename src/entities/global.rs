@@ -12,5 +12,5 @@ pub fn font(size:f32,color:Color) -> impl Scene {
 
 pub fn std_font(scale:f32) -> impl Scene {
     let size = scale;
-    font(size,Color::linear_rgb(0.5, 0.5, 0.5))
+    font(size,Color::linear_rgb(1.0, 0.0, 1.0))
 }   
