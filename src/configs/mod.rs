@@ -4,24 +4,25 @@
 //
 //const CONFIG_PATH:&str = r##"src/setting.toml"##;
 
-pub mod res_hello;
-pub mod res_sync;
-pub mod res_ui;
-pub mod res_pet;
-pub mod res_global;
+mod res_hello;
+mod res_sync;
+mod res_ui;
+mod res_pet;
+mod res_map;
+mod res_global;
 mod res_setting;
 mod res_shader;
 
 pub mod res{
     pub mod hello{pub use crate::configs::res_hello::*;}
     pub mod pet{pub use crate::configs::res_pet::*;}
+    pub mod map{pub use crate::configs::res_map::*;}
     pub mod setting{pub use crate::configs::res_setting::*;}
     pub mod sync{pub use crate::configs::res_sync::*;}
     pub mod global{pub use crate::configs::res_global::*;}
     pub mod layer{pub use crate::configs::res_ui::*;}
 }
 pub mod material{pub use crate::configs::res_shader::*;}
-
 
 use bevy::prelude::*;
 use res_setting::*;

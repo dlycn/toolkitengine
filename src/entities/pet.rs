@@ -1,5 +1,5 @@
 use crate::{
-    components::*, configs::{res_pet::PET_MAX_SPEED}, events::pets::ESelectPet,
+    components::*, configs::{res::pet::PET_MAX_SPEED}, events::pets::ESelectPet,
 };
 use bevy::{image::TextureAtlasTemplate};
 use bevy::prelude::*;
